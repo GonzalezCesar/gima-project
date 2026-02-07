@@ -22,7 +22,7 @@ export default function LoginPage() {
     // Simulate authentication delay
     setTimeout(() => {
       // Redirect to dashboard on successful login
-      router.push("/dashboard");
+      router.push("/");
     }, 500);
   };
 

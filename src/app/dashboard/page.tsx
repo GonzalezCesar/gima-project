@@ -9,9 +9,9 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <DashboardHeader subtitle="Bienvenido al panel GIMA" />
 
-      <div className="p-8 space-y-8">
+      <div className="p-4 sm:p-6 md:p-8 space-y-8 max-w-7xl mx-auto">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <StatCard title="Total activos" value="12345" trend={12} trendLabel="este mes" />
           <StatCard title="En mantenimiento" value="8" />
           <StatCard title="Presupuesto ejecutado" value="100$" highlighted={true} />
