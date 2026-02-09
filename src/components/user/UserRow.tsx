@@ -1,76 +1,128 @@
-
-//Encargado de la generacion de las filas dentro de la tabla de UserTable
-
-// Importamos la plantilla de Usuario, "User" la tendra
+'use client';
+import React, { useState } from 'react';
 import { User } from '../../types/user';
 
-//Un Uusario recibira la estructura asignada, mas la capacidad de realizar dos funciones
 interface UserRowProps {
     user: User;
-
-    //Funcion del UserTable, recibe una Id, devuelve nada
     onEliminar: (id: string) => void;
-
-    //Funcion del UserTable, recibe un Usuario, devuelve nada
-    onEditar: (user: User) => void; // Agregar esta prop
+    onEditar: (user: User) => void;
+    onGestionarPermisos: (user: User) => void; 
+    onVerDetalles:(user:User) =>void;
 }
 
-//Funcion usada en UserTable, requiere un Usuario dado por la interfaz "UserRowProps"
-export default function UserRow({ user, onEliminar, onEditar }: UserRowProps) {
-    //Retornamos el HTML
+export default function UserRow({ user, onEliminar, onEditar, onGestionarPermisos,onVerDetalles }: UserRowProps) {
+    // Estado para el menú desplegable de los tres puntitos
+    const [menuAbierto, setMenuAbierto] = useState(false);
+    const formatearFecha = (fechaISO: string) => {
+        if (!fechaISO) return "Nunca";
+        const fecha = new Date(fechaISO);
+        return fecha.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
     return (
-        //Fila de la tabla, utilizando Tailwind
-        <tr className="border-b hover:bg-gray-50">
+        <tr className="border-b hover:bg-gray-50 transition-colors relative">
             {/* Columna USUARIO */}
             <td className="p-4">
-                {/*Contenedor Flex*/}
                 <div className="flex items-center">
-                    {/* Avatar con iniciales */}
-                    <div className="h-10 w-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: "#F0FDFA", color: "#0B2545" }}>
+                    <div className="h-10 w-10 rounded-full flex items-center justify-center font-bold shadow-sm" style={{ backgroundColor: "#F0FDFA", color: "#0B2545" }}>
                         {user.iniciales}
                     </div>
-                    {/*Nombre y Email*/}
                     <div className="ml-4">
                         <div className="font-medium text-gray-900">{user.name}</div>
-                        <div className="text-gray-500">{user.email}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
                     </div>
                 </div>
             </td>
 
-            {/* Columna ROL */}
-            <td className="p-4 text-center">{user.rol}</td>
-
-            {/* Columna DEPARTAMENTO */}
-            <td className="p-4 text-center" >
-                <div className=" text-white py-1 rounded-lg" style={{ backgroundColor: "lightgray",   }}>
-                    <span className=" py-1 rounded-full text-black" > {user.department} </span>
+            {/* Columna ROL / CARGO */}
+            <td className="p-4 text-center">
+                <div className="font-medium text-gray-800">{user.rol}</div>
+                <div className="text-[10px] font-bold text-blue-500 uppercase italic">
+                    {user.internalLevel}
                 </div>
             </td>
+
+            {/* Columna DEPARTAMENTO Y CARACTERÍSTICAS */}
+            <td className="p-4 text-center">
+                <div className="flex flex-col items-center gap-1">
+                    <div className="px-3 py-1 rounded-lg bg-gray-200 text-black text-[11px] w-full max-w-[120px]">
+                        {user.department}
+                    </div>
+                </div>
+            </td>
+            
 
             {/* Columna ESTADO */}
             <td className="p-4 text-center">
-                {/*Dependiendo del String brindado, este sera rodeado en verde o rojo*/}
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {user.status}
+                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
+                    user.status === 'available' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                    {user.status === 'available' ? 'Disponible' : 'Inactivo'}
                 </span>
             </td>
 
-            {/* Columna ACCIÓN */}
+                {/* NUEVA COLUMNA: ÚLTIMO ACCESO (TIMESTAMP) */}
             <td className="p-4 text-center">
-                <button
-                    //Llama a la funcion de UserTable, enviando el User
-                    onClick={() => onEditar(user)}
-                    className="text-blue-600 hover:text-blue-900 mr-2"
-                >
-                    Editar
-                </button>
-                <button
-                    className="text-red-600 hover:text-red-900"
-                    //Llama a la funcion de UserTable, enviando el ID del User
-                    onClick={() => onEliminar(user.id)}
-                >
-                    Eliminar
-                </button>
+                <div className="text-[11px] text-gray-600 font-medium">
+                    {formatearFecha(user.lastAccess)}
+                </div>
+            </td>
+            
+            {/* Columna ACCIÓN (Con Menú de 3 puntos) */}
+            <td className="p-4 text-center relative">
+                <div className="flex justify-center items-center gap-2">
+                    {/* Botones principales rápidos */}
+                    <button onClick={() => onEditar(user)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full" title="Editar datos">
+                        ✏️
+                    </button>
+                    <button onClick={() => {onEliminar(user.id);setMenuAbierto(false);}} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
+                        🗑️ 
+                    </button>
+                    {/* Botón de Tres Puntos */}
+                    <div className="relative">
+                        <button 
+                            onClick={() => setMenuAbierto(!menuAbierto)}
+                            className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full font-bold"
+                        >
+                            ⋮
+                        </button>
+
+                        {/* Menú Desplegable (Dropdown) */}
+                        {menuAbierto && (
+                            <>
+                                {/* Overlay para cerrar al hacer clic fuera */}
+                                <div className="fixed inset-0 z-10" onClick={() => setMenuAbierto(false)}></div>
+                                
+                                <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-20 overflow-hidden text-left">
+                                    <button 
+                                        onClick={() => {
+                                            onGestionarPermisos(user);
+                                            setMenuAbierto(false);
+                                        }}
+                                        className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                                    >
+                                        🔐 Gestionar Permisos
+                                    </button>
+                                    <button 
+                                            onClick={() => {
+                                                onVerDetalles(user); 
+                                                setMenuAbierto(false);
+                                            }}
+                                        className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                    >
+                                        👁️ Ver Detalle Completo
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
             </td>
         </tr>
     );
