@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   Settings,
   LayoutDashboard,
@@ -8,13 +9,40 @@ import {
   Bell,
   User,
   Search,
+  Globe, // Changed to Globe as MapPin is not available in the context
 } from "lucide-react";
 
 interface ConfigCardProps {
   title: string;
   desc: string;
   icon: React.ReactNode;
+  href?: string;
 }
+
+const ConfigCard: React.FC<ConfigCardProps> = ({ title, desc, icon, href }) => {
+  const cardContent = (
+    <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition cursor-pointer flex gap-4 items-start h-full">
+      <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-slate-700">
+        {icon}
+      </div>
+      <div>
+        <h3 className="font-semibold mb-1 text-black">{title}</h3>
+        <p className="text-sm text-gray-500">{desc}</p>
+      </div>
+    </div>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className="h-full">
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
+};
+
 
 export default function ConfiguracionPage() {
   return (
@@ -39,11 +67,19 @@ export default function ConfiguracionPage() {
           title="Idioma y región"
           desc="Zona horaria y formato de fecha"
           icon={<LayoutDashboard size={20} />}
+          href="/configuracion/idiomas"
         />
         <ConfigCard
           title="Gestión de usuarios"
           desc="Roles y permisos"
           icon={<User size={20} />}
+          href="/configuracion/User"
+        />
+        <ConfigCard
+          title="Ubicaciones"
+          desc="Gestionar ubicaciones"
+          icon={<Globe size={20} />}
+          href="/configuracion/ubicaciones"
         />
         <ConfigCard
           title="Notificaciones"
@@ -69,17 +105,3 @@ export default function ConfiguracionPage() {
     </section>
   );
 }
-
-const ConfigCard: React.FC<ConfigCardProps> = ({ title, desc, icon }) => {
-  return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition cursor-pointer flex gap-4 items-start">
-      <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-slate-700">
-        {icon}
-      </div>
-      <div>
-        <h3 className="font-semibold mb-1 text-black">{title}</h3>
-        <p className="text-sm text-gray-500">{desc}</p>
-      </div>
-    </div>
-  );
-};

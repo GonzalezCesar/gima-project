@@ -5,7 +5,7 @@
 //State: Guarda datos en memoria
 //Effect: Ejecuta codigo cuando algo cambia
 import React, { useState, useEffect } from 'react';
-import { User } from '../types/user';
+import { User } from '../../types/user';
 
 //Necesario para el uso de la Funcion UserModal
 interface UserModalProps {

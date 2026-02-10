@@ -5,6 +5,7 @@ import Link from "next/link";
 import { 
   Search, Bell, User, BookOpen, FileCheck, AlertCircle, MessageSquare, Zap, Wrench, Bot, Sparkles, Send
 } from "lucide-react";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
 
 export default function Dashboard() {
   
@@ -12,10 +13,17 @@ export default function Dashboard() {
 
   return (
     <main className="p-8 w-full h-full overflow-y-auto flex flex-col">
-      
+      <DashboardHeader subtitle="Bienvenido al panel GIMA" />
       {/* header*/}
-      <header className="flex justify-between items-center mb-10">
-        <h1 className="font-microgramma text-4xl text-black">Reportes</h1>
+      {/* <header className="flex justify-between items-center mb-10">
+        <div>
+          <h1 className="text-3xl font-bold text-gima-navy font-title tracking-wide">
+            REPORTES
+          </h1>
+          <p className="text-gima-gray text-sm mt-1 font-medium">
+            Clasificación de reportes
+          </p>
+        </div>
         <div className="flex items-center gap-6">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gima-gray" size={18} />
@@ -26,7 +34,7 @@ export default function Dashboard() {
             <button className="p-2 bg-white rounded-xl shadow-sm hover:shadow-md hover:text-gima-blue transition-all"><User size={20} className="text-slate-600 hover:text-gima-blue" /></button>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* cards del dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -35,7 +43,7 @@ export default function Dashboard() {
         <StatCard icon={<AlertCircle size={24} />} title="Reportes Pendientes" value="254" subtext="Requieren acción" />
       </div>
 
-      <div className="bg-white rounded-3xl p-2 shadow-sm flex-1 flex flex-col min-h-[500px]">
+      <div className="bg-white rounded-3xl p-2 shadow-sm flex-1 flex flex-col min-h-125">
         
         {/* nav bar interna */}
         <div className="mx-6 mt-6 mb-8 bg-gima-light rounded-full px-8 py-3 flex items-center justify-between">
