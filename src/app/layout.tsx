@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-// @ts-ignore
+import { MainLayout } from "@/components/layout/MainLayout";
+// @ts-expect-error: allow side-effect CSS import without type declarations
 import "./globals.css";
 
 const microgramma = localFont({
@@ -30,9 +31,7 @@ export default function RootLayout({
       <body
         className={`${microgramma.variable} ${archivo.variable} antialiased bg-gima-light`}
       >
-        <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
-          {children}
-        </div>
+        <MainLayout>{children}</MainLayout>
       </body>
     </html>
   );
