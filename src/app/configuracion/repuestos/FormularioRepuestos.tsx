@@ -217,4 +217,5 @@ export const FormularioRepuestos = ({ isOpen, onClose }: Props) => {
       </div>
     </div>
   );
-};
+}; 
+//Revisa Nale//
