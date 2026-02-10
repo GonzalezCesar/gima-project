@@ -1,68 +1,64 @@
-import {User, userEstado} from '../types/user';
+import { User } from '../types/user';
+
+export type Permission = 'Lectura' | 'Escritura' | 'Eliminación' | 'Exportación';
+
+export const ALL_PERMISSIONS: Permission[] = ['Lectura', 'Escritura', 'Eliminación', 'Exportación'];
 
 export const mockUsers: User[] = [
     {
         id: '1',
         iniciales: 'FC',
         name: 'Frank Chacon',
-        email:'frankManuel1991@gmail.com',
-        rol: 'Engineer',
-        department: 'frontend',
+        email: 'frankManuel1991@gmail.com',
+        rol: 'Ingeniero',
+        department: 'Sistemas',
         status: 'unavailable',
-        hireDate: '15/03/2023',
-        lastAccess: '25/05/2024 09:15 AM',
-        internalLevel: 'TÉCNICAS',
-        characteristics: 'Técnicas de venta avanzadas',
-        permissions: ['Acceso dashboard', 'Gestión de inventario', 'Edición de configuración'],
-        position: 'Senior Frontend Developer',
-        userId: 'USR-001',
+        internalLevel: 'Administrador',
+        characteristics: 'Experto en arquitectura frontend y liderazgo de equipos técnicos.',
+        permissions: ['Lectura', 'Escritura', 'Eliminación', 'Exportación'],
+        createdAt: '2024-05-10T14:20:00Z', // Ingresó hace tiempo
+        lastAccess: '2026-02-09T09:30:00Z' 
     },
     {
         id: '2',
         iniciales: 'NE',
         name: 'Nour Ehab',
         email: 'NourEhab19@gmail.com',
-        rol: 'Doctor',
-        department: 'cardiology',
+        rol: 'Médico',
+        department: 'Laboratorio',
         status: 'available',
-        hireDate: '20/03/2022',
-        lastAccess: '20/05/2026 10:00 AM',
-        internalLevel: 'KPI/C',
-        characteristics: 'Especialista en cardiología intervencionista',
-        permissions: ['Ver pacientes', 'Historial clínico', 'Reportes médicos', 'Agenda citas'],
-        position: 'Cardiólogo Senior',
-        userId: 'USR-002',
+        internalLevel: 'Tecnico',
+        characteristics: 'Especialista en gestión hospitalaria y análisis de datos clínicos.',
+        permissions: ['Lectura', 'Exportación'],
+        createdAt: '2025-01-20T11:00:00Z',
+        lastAccess: '2026-02-08T18:15:00Z'
     },
     {
         id: '3',
         iniciales: 'YD',
         name: 'Yasmin dos Santos',
         email: 'Yasmin2Santos@gmail.com',
-        rol: 'Graduated',
-        department: 'Vet',
-        status: 'inactive' ,
-        hireDate: '10/08/2021',
-        lastAccess: '15/12/2025 03:45 PM',
-        internalLevel: 'OTRO',
-        characteristics: 'Experta en cirugía veterinaria',
-        permissions: ['Consultas básicas', 'Vacunación', 'Cirugías menores', 'Historial mascotas'],
-        position: 'Veterinaria Especialista',
-        userId: 'USR-003',
+        rol: 'Consultor',
+        department: 'Recursos Humanos',
+        status: 'unavailable',
+        internalLevel: 'Asistente',
+        characteristics: 'Enfoque en capacitación interna y bienestar organizacional.',
+        permissions: ['Lectura'],
+        createdAt: '2025-08-15T09:45:00Z',
+        lastAccess: '2026-02-06T10:00:00Z'
     },
     {
         id: '4',
         iniciales: 'VC',
         name: 'Valeria Castro',
         email: 'ValeriaCastro@gmail.com',
-        rol: 'Doctor',
-        department: 'pediatrics',
-        status: 'active',
-        hireDate: '05/11/2023',
-        lastAccess: '09/02/2026 08:30 AM',
-        internalLevel: 'TÉCNICAS',
-        characteristics: 'Pediatra con enfoque en neonatología',
-        permissions: ['Atención neonatal', 'Vacunación infantil', 'Control crecimiento', 'Emergencias pediátricas'],
-        position: 'Pediatra Especialista',
-        userId: 'USR-004',
+        rol: 'Médico',
+        department: 'Mantenimiento',
+        status: 'available',
+        internalLevel: 'Supervisor',
+        characteristics: 'Supervisión de protocolos médicos y seguridad en planta.',
+        permissions: ['Lectura', 'Escritura'],
+        createdAt: '2026-01-05T08:30:00Z', // Reciente
+        lastAccess: '2026-02-09T12:00:00Z'
     }
 ];
