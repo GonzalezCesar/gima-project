@@ -2,8 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { User } from '../types/user';
-import { mockUsers } from '../utils/mockUsers';
+import { User } from '@/types/user';
+import { mockUsers } from '@/utils/mockUsers';
 import UserRow from './UserRow';
 import UserModal from './UserModal'; // Agregar esta importación
 
@@ -43,6 +43,7 @@ export default function UserTable() {
     };
 
     // 8. FUNCIÓN: Guardar usuario (AGREGAR)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const guardarUsuario = (userData: any) => {
         if (usuarioEditando) {
             // Modo edición: actualizar usuario existente

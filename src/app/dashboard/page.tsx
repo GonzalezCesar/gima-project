@@ -7,7 +7,7 @@ import { ChartPlaceholder } from "@/components/ui/ChartPlaceholder"
 export default function DashboardPage() {
   return (
     <div className="min-h-screen">
-      <DashboardHeader title="Dashboard" subtitle="Bienvenido al panel GIMA" />
+      <DashboardHeader subtitle="Bienvenido al panel GIMA" />
 
       <div className="p-8 space-y-8">
         {/* Stats Grid */}

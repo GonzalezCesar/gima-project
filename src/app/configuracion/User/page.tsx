@@ -1,4 +1,4 @@
-import UserTable from './components/UserTable';
+import UserTable from '@/components/user/UserTable';
 
 export default function GestionUsuariosPage(){
     return <UserTable/>;

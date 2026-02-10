@@ -1,4 +1,6 @@
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { Search, Bell, User, Plus, ChevronLeft, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 
 export default function UbicacionesPage() {
@@ -13,33 +15,34 @@ export default function UbicacionesPage() {
   return (
     // Contenedor principal
     <div className="min-h-screen bg-[#F8FAFC] p-8">
+        <DashboardHeader />
       <div className="max-w-6xl mx-auto">
+
         
         {/* ================= HEADER SUPERIOR ================= */}
         <header className="flex justify-between items-center mb-10">
 
           {/* TÍTULOS */}
           <div>
-            <h1 className="text-[28px] font-bold text-[#0B2545] font-microgramma uppercase leading-tight tracking-tight">
+            <h1 className="text-[28px] font-bold text-gima-navy font-microgramma uppercase leading-tight tracking-tight">
               Configuración /
             </h1>
 
-            <h2 className="text-[28px] font-bold text-[#0B2545] font-microgramma uppercase leading-tight tracking-tight">
+            <h2 className="text-[28px] font-bold text-gima-navy font-microgramma uppercase leading-tight tracking-tight">
               Ubicaciones
             </h2>
           </div>
           
           {/* CONTENEDOR DE BUSCADOR + ICONOS */}
-          <div className="flex items-center gap-4">
+          
+          {/* <div className="flex items-center gap-4">
 
-            {/* ================= BUSCADOR ================= */}
             <div className="relative font-archivo">
               <Search
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                 size={18}
               />
 
-              {/* Campo de búsqueda */}
               <input 
                 type="text"
                 placeholder="Buscar"
@@ -49,40 +52,41 @@ export default function UbicacionesPage() {
                   border-none
                   shadow-sm
                   w-72
-                  focus:ring-2 focus:ring-[#0066FF]
-                  bg-[#F0FDFA]
-                  text-[#0B2545]
+                  focus:ring-2 focus:ring-gima-blue
+                  bg-gima-light
+                  text-gima-navy
                 "
               />
             </div>
 
-            {/* ================= BOTÓN NOTIFICACIONES ================= */}
-            <button className="p-2.5 bg-[#F0FDFA] rounded-xl shadow-sm border border-gray-100 hover:bg-white transition-all">
-              <Bell size={22} className="text-[#0B2545]" />
+            <button className="p-2.5 bg-gima-light rounded-xl shadow-sm border border-gray-100 hover:bg-white transition-all">
+              <Bell size={22} className="text-gima-navy" />
             </button>
 
-            {/* ================= BOTÓN USUARIO ================= */}
-            <button className="p-2.5 bg-[#F0FDFA] rounded-xl shadow-sm border border-gray-100 hover:bg-white transition-all">
-              <User size={22} className="text-[#0B2545]" />
+            <button className="p-2.5 bg-gima-light rounded-xl shadow-sm border border-gray-100 hover:bg-white transition-all">
+              <User size={22} className="text-gima-navy" />
             </button>
-          </div>
+          </div>  */}
+
         </header>
 
         {/* BOTÓN VOLVER */}
+        <Link href="/configuracion" > 
             <button className="flex items-center gap-2 text-gray-500 mb-6 hover:text-[#0d2344] transition-colors">
                 <div className="bg-white p-1 rounded-md shadow-sm"><ChevronLeft size={16} /></div>
                 <span className="text-sm font-medium">Volver a configuración</span>
             </button>
+        </Link>
 
         {/* ================= CONTENEDOR PRINCIPAL ================= */}
         <div className="bg-white rounded-[40px] shadow-sm border border-gray-50 overflow-hidden">
           
           {/* CABECERA DEL CONTENIDO */}
-          <div className="bg-[#F0FDFA] p-10 pb-8 border-b border-blue-50">
+          <div className="bg-gima-light p-10 pb-8 border-b border-blue-50">
           <div className="flex justify-between items-start">
             <div>
         
-              <h3 className="text-xl font-bold text-[#0B2545] font-microgramma uppercase">
+              <h3 className="text-xl font-bold text-gima-navy font-microgramma uppercase">
                 Ubicaciones y sedes
               </h3>
 
@@ -93,7 +97,7 @@ export default function UbicacionesPage() {
 
             {/* BOTÓN NUEVA UBICACIÓN */}
             <button className="
-              bg-[#0066FF]
+              bg-gima-blue
               text-white
               px-6 py-3
               rounded-xl
@@ -120,7 +124,7 @@ export default function UbicacionesPage() {
               bg-[#DAFAFE]
               p-6
               rounded-t-[30px]
-              text-[#0B2545]
+              text-gima-navy
               font-microgramma
               font-bold
               text-[10px]
@@ -153,10 +157,10 @@ export default function UbicacionesPage() {
                 >
                   {/* ATRIBUTOS */}
                   <span className="text-sm text-gray-400 font-medium">{loc.id}</span>
-                  <span className="text-sm font-bold text-[#0B2545]">{loc.nombre}</span>
+                  <span className="text-sm font-bold text-gima-navy">{loc.nombre}</span>
                   <span className="text-sm text-gray-500">{loc.edificio}</span>
                   <div>
-                    <span className="bg-[#E3F2FD] text-[#0B2545] px-4 py-1.5 rounded-full text-[10px] font-bold">
+                    <span className="bg-[#E3F2FD] text-gima-navy px-4 py-1.5 rounded-full text-[10px] font-bold">
                       {loc.estado}
                     </span>
                   </div>

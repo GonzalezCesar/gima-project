@@ -1,18 +1,23 @@
 "use client"
 
 import { Bell, User, Search } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 interface DashboardHeaderProps {
-  title?: string
   subtitle?: string
 }
 
-export function DashboardHeader({ title = "Dashboard", subtitle = "Bienvenido al panel GIMA" }: DashboardHeaderProps) {
+export function DashboardHeader({ subtitle = "Bienvenido al panel GIMA" }: DashboardHeaderProps) {
+  const pathname = usePathname()
+  const pathParts = pathname.split("/").filter((part) => part)
+  const lastPart = pathParts.length > 0 ? pathParts[pathParts.length - 1] : "Dashboard"
+  const title = lastPart.charAt(0).toUpperCase() + lastPart.slice(1)
+
   return (
     <div className="bg-white border-b border-gray-200 px-8 py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Hola, administrador!</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
           <p className="text-gray-600 mt-1">{subtitle}</p>
         </div>
 

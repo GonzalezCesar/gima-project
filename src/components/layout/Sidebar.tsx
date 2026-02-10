@@ -30,22 +30,22 @@ export function Sidebar() {
     {
       icon: Box,
       label: "Activos",
-      href: "/dashboard/categorias-activos", // Usando la ruta anidada del Code B
+      href: "/categorias-activos", // Usando la ruta anidada del Code B
     },
     {
       icon: Wrench,
       label: "Mantenimiento",
-      href: "/dashboard/mantenimiento",
+      href: "/mantenimiento",
     },
     {
       icon: ClipboardList,
       label: "Reportes",
-      href: "/dashboard/reportes",
+      href: "/reportes",
     },
     {
       icon: Settings,
       label: "Configuración",
-      href: "/dashboard/configuracion",
+      href: "/configuracion",
     },
   ];
 
@@ -94,8 +94,9 @@ export function Sidebar() {
           const Icon = item.icon;
           // Detectar si está activo (coincidencia exacta o sub-ruta)
           const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
-
+            item.href === "/dashboard"
+              ? pathname === "/dashboard" // Caso especial: Dashboard se sombrea solo si es exacto
+              : pathname === item.href || pathname.startsWith(`${item.href}/`); // Los demás 
           return (
             <Link
               key={item.href}

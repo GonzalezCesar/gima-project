@@ -2,7 +2,7 @@
 //Encargado de la generacion de las filas dentro de la tabla de UserTable
 
 // Importamos la plantilla de Usuario, "User" la tendra
-import { User } from '../types/user';
+import { User } from '../../types/user';
 
 //Un Uusario recibira la estructura asignada, mas la capacidad de realizar dos funciones
 interface UserRowProps {
