@@ -1,4 +1,5 @@
-export type UserEstado = 'available' | 'unavailable';
+export type userEstado = 'active' | 'inactive' | 'available' | 'unavailable';
+export type innerlevel = 'TÉCNICAS' | 'KPI/C' | 'OTRO';
 
 export interface User {
     id: string;
@@ -7,5 +8,14 @@ export interface User {
     email: string;
     rol: string;
     department: string;
-    status: UserEstado;
+    status: userEstado;
+    hireDate: string;
+    lastAccess: string;
+    internalLevel: innerlevel;
+    characteristics: string;
+    permissions: string[];
+    position?: string;
+    userId?: string;
 }
+
+export type UserFormData = Omit<User, 'id' | 'lastAccess'>;

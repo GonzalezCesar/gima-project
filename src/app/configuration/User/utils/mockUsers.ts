@@ -1,4 +1,4 @@
-import {User, UserEstado} from '../types/user';
+import {User, userEstado} from '../types/user';
 
 export const mockUsers: User[] = [
     {
@@ -9,7 +9,13 @@ export const mockUsers: User[] = [
         rol: 'Engineer',
         department: 'frontend',
         status: 'unavailable',
-
+        hireDate: '15/03/2023',
+        lastAccess: '25/05/2024 09:15 AM',
+        internalLevel: 'TÉCNICAS',
+        characteristics: 'Técnicas de venta avanzadas',
+        permissions: ['Acceso dashboard', 'Gestión de inventario', 'Edición de configuración'],
+        position: 'Senior Frontend Developer',
+        userId: 'USR-001',
     },
     {
         id: '2',
@@ -19,6 +25,13 @@ export const mockUsers: User[] = [
         rol: 'Doctor',
         department: 'cardiology',
         status: 'available',
+        hireDate: '20/03/2022',
+        lastAccess: '20/05/2026 10:00 AM',
+        internalLevel: 'KPI/C',
+        characteristics: 'Especialista en cardiología intervencionista',
+        permissions: ['Ver pacientes', 'Historial clínico', 'Reportes médicos', 'Agenda citas'],
+        position: 'Cardiólogo Senior',
+        userId: 'USR-002',
     },
     {
         id: '3',
@@ -27,7 +40,14 @@ export const mockUsers: User[] = [
         email: 'Yasmin2Santos@gmail.com',
         rol: 'Graduated',
         department: 'Vet',
-        status: 'unavailable',
+        status: 'inactive' ,
+        hireDate: '10/08/2021',
+        lastAccess: '15/12/2025 03:45 PM',
+        internalLevel: 'OTRO',
+        characteristics: 'Experta en cirugía veterinaria',
+        permissions: ['Consultas básicas', 'Vacunación', 'Cirugías menores', 'Historial mascotas'],
+        position: 'Veterinaria Especialista',
+        userId: 'USR-003',
     },
     {
         id: '4',
@@ -36,6 +56,13 @@ export const mockUsers: User[] = [
         email: 'ValeriaCastro@gmail.com',
         rol: 'Doctor',
         department: 'pediatrics',
-        status: 'available',
+        status: 'active',
+        hireDate: '05/11/2023',
+        lastAccess: '09/02/2026 08:30 AM',
+        internalLevel: 'TÉCNICAS',
+        characteristics: 'Pediatra con enfoque en neonatología',
+        permissions: ['Atención neonatal', 'Vacunación infantil', 'Control crecimiento', 'Emergencias pediátricas'],
+        position: 'Pediatra Especialista',
+        userId: 'USR-004',
     }
 ];
