@@ -5,7 +5,9 @@ import { useState } from 'react';
 import { User } from '@/types/user';
 import { mockUsers } from '@/utils/mockUsers';
 import UserRow from './UserRow';
-import UserModal from './UserModal'; // Agregar esta importación
+import UserModal from './UserModal'; 
+import UserDetailModal from './UserDetailModal';
+import PermissionModal from './PermissionModal';
 
 export default function UserTable() {
     // 1. ESTADO: Guardar la lista de usuarios
@@ -17,7 +19,8 @@ export default function UserTable() {
     // 3. ESTADO: Controlar modal (AGREGAR)
     const [modalAbierto, setModalAbierto] = useState(false);
     const [usuarioEditando, setUsuarioEditando] = useState<User | null>(null);
-
+    const [isPermodalOpen, setIsPermodalOpen] = useState(false)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     // 4. FUNCIÓN: Eliminar usuario por ID
     const eliminarUsuario = (id: string) => {
         const nuevosUsuarios = users.filter(user => user.id !== id);
@@ -35,7 +38,14 @@ export default function UserTable() {
         setUsuarioEditando(user);
         setModalAbierto(true);
     };
-
+    const abrirModalPermissions = (user: User) => {
+        setUsuarioEditando(user);
+        setIsPermodalOpen(true);
+    };
+    const abrirModalDetails = (user: User) => { // 3. Función para detalles
+        setUsuarioEditando(user);
+        setIsDetailModalOpen(true);
+    };
     // 7. FUNCIÓN: Cerrar modal (AGREGAR)
     const cerrarModal = () => {
         setModalAbierto(false);
@@ -63,6 +73,7 @@ export default function UserTable() {
         cerrarModal();
     };
 
+
     // 9. FILTRAR usuarios según búsqueda (CORREGIR nombres de propiedades)
     const usuariosFiltrados = users.filter(user =>
         user.name.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -74,11 +85,30 @@ export default function UserTable() {
 
         <div className="bg-gray-50">
             <div className="p-6">
-                {/* Título y descripción */}
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">Gestión de usuarios</h1>
-                    <p className="text-gray-600">Administración de permisos y personal</p>
+               {/*Titulo */}
+                <div className="flex flex-col gap-4 mb-10">
+                    
+
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-3">
+                           <button 
+                        onClick={() => window.history.back()} 
+                        className="group flex items-center gap-2 text-gray-400 hover:text-blue-600 transition-all w-fit"
+                    >
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm group-hover:bg-blue-50 transition-colors">
+                            ←
+                        </span>
+                    </button>
+                            <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+                                Gestión de Usuarios
+                            </h1>
+                        </div>
+                        <p className="text-gray-500 text-sm ml-12">
+                            Monitoreo de actividad, permisos y perfiles administrativos.
+                        </p>
+                    </div>
                 </div>
+                
 
                 {/* Barra de búsqueda y botón */}
                 <div className="flex justify-between items-center mb-6">
@@ -105,7 +135,7 @@ export default function UserTable() {
                 </div>
 
                 {/* Tabla de usuarios */}
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="bg-white rounded-lg border border-gray-200 ">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead style={{ backgroundColor: "#F0FDFA" }}>
                         <tr>
@@ -121,6 +151,9 @@ export default function UserTable() {
                             <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider" style={{ color: "#0B2545" }}>
                                 ESTADO
                             </th>
+                              <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider" style={{ color: "#0B2545" }}>
+                                Último Acceso
+                            </th>
                             <th className="px-6 py-3 text-center text-xs font-bold  uppercase tracking-wider" style={{ color: "#0B2545" }}>
                                 ACCIÓN
                             </th>
@@ -132,20 +165,37 @@ export default function UserTable() {
                                 key={user.id}
                                 user={user}
                                 onEliminar={eliminarUsuario}
-                                onEditar={abrirModalEditar} // Pasar función de editar
+                                onEditar={abrirModalEditar} 
+                                onGestionarPermisos={abrirModalPermissions}
+                                onVerDetalles={abrirModalDetails}
                             />
                         ))}
                         </tbody>
                     </table>
                 </div>
 
-                {/* Agregar el modal aquí (sin cambiar estilos existentes) */}
                 <UserModal
                     isOpen={modalAbierto}
                     onClose={cerrarModal}
                     onSave={guardarUsuario}
                     user={usuarioEditando}
                 />
+                <PermissionModal 
+                    isOpen={isPermodalOpen}
+                    user={usuarioEditando}
+                    onClose={() => setIsPermodalOpen(false)}
+                    onSave={(userId, newPerms) => {setUsers(prevUsers => 
+                                        prevUsers.map(u => 
+                                            u.id === userId 
+                                                ? { ...u, permissions: newPerms }: u));
+                                console.log("Permisos actualizados para el usuario:", userId, newPerms);
+                            }}
+                    />
+                    <UserDetailModal 
+                        isOpen={isDetailModalOpen}
+                        user={usuarioEditando}
+                        onClose={() => setIsDetailModalOpen(false)}
+                    />
             </div>
         </div>
     );
