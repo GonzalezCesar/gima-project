@@ -58,18 +58,18 @@ export const FormularioRepuestos = ({ isOpen, onClose }: Props) => {
       return;
     }
 
-    // ==========================================================================
-    // ¡¡¡ AQUÍ EL BACKEND DEBE PONER SU CONEXIÓN (API CALL) !!!
-    // ==========================================================================
+    // ===================================================
+    // AQUÍ EL BACKEND DEBE PONER SU CONEXIÓN (API CALL) 
+    // ===================================================
     console.log("Enviando datos al servidor...", formData);
     try {
-      // Lógica de conexión aquí...
-      alert(`¡Repuesto "${formData.nombre}" procesado correctamente!`);
+      // Lógica de conexión aquí
+      alert(`¡Repuesto "${formData.nombre}" procesado correctamente`);
       onClose();
     } catch (error) {
       alert("Error de conexión con el servidor.");
     }
-    // ==========================================================================
+    // ====================================================
   };
 
   if (!isOpen) return null;
