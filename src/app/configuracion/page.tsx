@@ -43,7 +43,6 @@ const ConfigCard: React.FC<ConfigCardProps> = ({ title, desc, icon, href }) => {
   return cardContent;
 };
 
-
 export default function ConfiguracionPage() {
   return (
     <section className="p-8">
@@ -74,6 +73,12 @@ export default function ConfiguracionPage() {
           desc="Roles y permisos"
           icon={<User size={20} />}
           href="/configuracion/User"
+        />
+        <ConfigCard
+          title="Historial de usuarios"
+          desc="Registros de actividad"
+          icon={<User size={20} />}
+          href="/configuracion/historial"
         />
         <ConfigCard
           title="Ubicaciones"
