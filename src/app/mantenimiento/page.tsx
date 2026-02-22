@@ -1,304 +1,160 @@
 "use client"
 
-import { useState } from "react"
-import { Plus, Wrench, Clock, CheckCircle, X, Search } from "lucide-react"
-import { mockTecnicos , mockOrdenes} from "@/utils/mockMantenimiento"
-import {Orden, OrdenEstado,TipoMantenimiento,Prioridad} from '@/types/mantenimiento';
+import React, { useState } from "react"
+import { DashboardHeader } from "@/components/layout/DashboardHeader"
+import Link from "next/link"
 
-export default function Mantenimiento() {
-    const [ordenes, setOrdenes] = useState<Orden[]>(mockOrdenes);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const totalPendientes = ordenes.filter(o => o.estado === 'pendiente').length;
-    const totalEnProceso = ordenes.filter(o => o.estado === 'en-proceso').length;
-    const totalCompletadas = ordenes.filter(o => o.estado === 'completada').length;
-    const [searchTerm, setSearchTerm] = useState("");
+/*
+  Documentación extensa y guía de integración (DESARROLLADOR):
 
-// 2. Lógica de filtrado dinámico
-const ordenesFiltradas = ordenes.filter((orden) => {
-  const nombreTecnico = orden.tecnicoNombre.toLowerCase();
-  const busqueda = searchTerm.toLowerCase();
-  
-  return nombreTecnico.includes(busqueda);
-});
-  const [formData, setFormData] = useState({
-    activo: '',
-    tecnicoId: '',
-    estado: '',
-    prioridad: 'media' as Prioridad,
-    tipo: 'correctivo' as TipoMantenimiento,
-    fechaCulminacion:''
-  });
+  Objetivo:
+  - Mantener la UI exactamente en el formato esperado por el diseño mientras
+    no haya una BD configurada. No mostrar "números ficticios" en las
+    métricas principales; en su lugar, mostrar un placeholder visual (—)
+    cuando no existan datos reales.
 
-  const handleCrearOrden = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const tecnico = mockTecnicos.find(t => t.id === formData.tecnicoId);
-    
-    const nuevaOrden: Orden = {
-      id: `ORD-00${ordenes.length + 1}`,
-      activo: formData.activo,
-      tecnicoId: formData.tecnicoId,
-      tecnicoNombre: tecnico ? tecnico.name : 'Sin asignar',
-      prioridad: formData.prioridad,
-      estado: 'pendiente'  as OrdenEstado,
-      tipo: formData.tipo,
-      fecha: new Date().toISOString().split('T')[0],
-      fechaCulminacion: ''
-    };
+  Comportamiento actual implementado en este archivo:
+  - Los `StatusCard` ya no muestran valores numéricos ficticios. Si la
+    propiedad `count` no está presente o no es un número, se renderiza
+    un guion (`—`) gris como placeholder. Esto preserva el layout y el
+    peso visual del componente para cuando lleguen los datos reales.
+  - Las filas de "Ordenes de trabajo" se mantienen como ejemplos visibles
+    (tal como solicitaste) para referencia visual. Para dejar claro que
+    se trata de datos de ejemplo y evitar confusiones con datos reales,
+    la sección muestra una pequeña etiqueta `Ejemplo` en la esquina.
 
-    setOrdenes([nuevaOrden, ...ordenes]);
-    setIsModalOpen(false);
-    setFormData({ activo: '', tecnicoId: '', prioridad: 'media', tipo: 'correctivo' ,fechaCulminacion:'',estado:''});
-  };
+  Cómo integrar datos reales cuando la BD/endpoint estén disponibles:
+  1) Implementar un servicio en `src/services/dataService.ts` que exponga
+     funciones como `getMaintenanceSummary()` y `getWorkOrders()`.
+  2) Reemplazar las llamadas locales (los ejemplos aquí) por fetching real
+     en un hook (por ejemplo `useEffect`) o, en el caso de Next.js App Router,
+     usar funciones `fetch` en un componente servidor y pasar los props al
+     cliente. Ejemplo de contrato esperado:
+     - getMaintenanceSummary() -> { pendiente: number, en_progreso: number, programado: number, completado: number }
+     - getWorkOrders() -> Array<{ id, title, type, date, severity, status }>
+  3) Mapear los valores recibidos a las props de `StatusCard` y `WorkOrderRow`.
+  4) Mantener el mismo formato: si un campo falta, el componente ya maneja
+     placeholders (p. ej. `—` para números y textos grises para campos vacíos).
 
-  const tecnicos = mockTecnicos.filter(
-    user => user.rol?.toLowerCase() === 'tecnico'
-  );
+  Notas sobre UX y visualización temporal:
+  - Mientras no hay datos, mostramos el placeholder en las métricas y
+    mantenemos ejemplos en la lista de órdenes con la etiqueta `Ejemplo`.
+  - Cuando lleguen datos reales, simplemente actualizar la fuente de datos
+    (y pasar `count` como número) hará que los `StatusCard` muestren
+    automáticamente los números reales.
+
+  Seguridad / producción:
+  - No incluir credenciales en código. Usar variables de entorno y un
+    servicio/dependency injection para los detalles de BD.
+  - Añadir manejo de errores y estados de carga para mejorar la UX.
+*/
+
+export default function MantenimientoPage() {
+  const [query, setQuery] = useState("")
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50/50">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex justify-between items-center w-full">
-            <div>
-                <h1 className="text-2xl font-bold text-gray-800">Mantenimiento</h1>
-                <p className="text-sm text-gray-500">Bienvenido al panel GIMA</p>
-            </div>
-            <div className="flex items-center gap-6">
-            <div className="relative group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={18} />
-                    <input 
-                    type="text"
-                     placeholder="Buscar técnico..."
-                    className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-full w-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-            </div>
-        </div>
-        </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
-        >
-          <Plus size={18} /> Nueva Orden
-        </button>
+    <div className="min-h-screen">
+      <DashboardHeader subtitle="" />
 
-      </div>
-
-      
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <StatCard 
-            icon={<Clock className="text-orange-600" />} 
-            label="Pendientes" 
-            value={totalPendientes.toString()} 
-            color="bg-orange-100" 
-        />
-        <StatCard 
-            icon={<Wrench className="text-blue-600" />} 
-            label="En Proceso" 
-            value={totalEnProceso.toString()} 
-            color="bg-blue-100" 
-        />
-        <StatCard 
-            icon={<CheckCircle className="text-green-600" />} 
-            label="Completadas" 
-            value={totalCompletadas.toString()} 
-            color="bg-green-100" 
-        />
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 text-gray-400 text-xs uppercase font-bold">
-            <tr>
-              <th className="p-4">ID</th>
-              <th className="p-4">Activo</th>
-              <th className="p-4">Técnico</th>
-              <th className="p-4">Prioridad</th>
-              <th className="p-4 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {ordenes.map((orden) => (
-              <tr key={orden.id} className="hover:bg-gray-50">
-                <td className="p-4 text-xs font-mono text-gray-400">{orden.id}</td>
-                <td className="p-4 font-bold text-gray-800">{orden.activo}</td>
-                <td className="p-4 text-gray-600">{orden.tecnicoNombre}</td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                    orden.prioridad === 'alta' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    {orden.prioridad}
-                  </span>
-                </td>
-                <td className="p-4 text-right">
-                  <button className="text-blue-600 font-bold text-sm mr-3">Editar</button>
-                  <button 
-                    onClick={() => setOrdenes(ordenes.filter(o => o.id !== orden.id))}
-                    className="text-red-400 font-bold text-sm"
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl animate-in fade-in zoom-in duration-200">
-                        <div className="p-6 border-b flex justify-between items-center">
-                        <div>
-                    <h2 className="text-xl font-bold text-gray-800 uppercase">Nueva Orden</h2>
-          <p className="text-sm text-gray-500">Agendar servicio en mantenimiento</p>
-        </div>
-        <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-          <X size={24} />
-        </button>
-      </div>
-
-      <form onSubmit={handleCrearOrden} className="p-6 space-y-4">
-        {/* FILA 1: ACTIVO */}
-        <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Seleccionar Activo</label>
-          <select 
-            className="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"
-            value={formData.activo} 
-            onChange={(e) => setFormData({ ...formData, activo: e.target.value })} 
-            required
-          >
-            <option value="">Seleccione un equipo...</option>
-            <option value="Montacargas Yale 2.5T">Montacargas Yale 2.5T</option>
-            <option value="Compresor Industrial A-12">Compresor Industrial A-12</option>
-          </select>
+      <div className="p-8 space-y-6">
+        <div className="flex items-center justify-end">
+          <Link href="/mantenimiento/calendario">
+            <button className="px-5 py-3 bg-blue-600 text-white rounded-full text-base flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor" aria-hidden="true">
+                <path d="M19,2.02v-.52c0-.83-.67-1.5-1.5-1.5s-1.5,.67-1.5,1.5v.5H8v-.5c0-.83-.67-1.5-1.5-1.5s-1.5,.67-1.5,1.5v.52C2.2,2.28,0,4.64,0,7.5v11c0,3.03,2.47,5.5,5.5,5.5h13c3.03,0,5.5-2.47,5.5-5.5V7.5c0-2.86-2.2-5.22-5-5.48ZM10,14v-4h4v4h-4Zm4,3v4h-4v-4h4ZM3,10H7v4H3v-4Zm14,0h4v4h-4v-4ZM5.5,5h13c1.21,0,2.22,.86,2.45,2H3.05c.23-1.14,1.24-2,2.45-2Zm-2.5,13.5v-1.5H7v4h-1.5c-1.38,0-2.5-1.12-2.5-2.5Zm15.5,2.5h-1.5v-4h4v1.5c0,1.38-1.12,2.5-2.5,2.5Z" />
+              </svg>
+              Calendario
+            </button>
+          </Link>
         </div>
 
-        {/* FILA 2: TÉCNICO */}
-        <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Técnico Asignado</label>
-          <select 
-            className="w-full p-2 border border-gray-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500"
-            value={formData.tecnicoId}
-            onChange={(e) => setFormData({ ...formData, tecnicoId: e.target.value })}
-            required
-          >
-            <option value="">Seleccione un técnico...</option>
-            {tecnicos.map((tec) => (
-              <option key={tec.id} value={tec.id}>{tec.name}</option>
-            ))}
-          </select>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+           <StatusCard title="PENDIENTE" colorKey="red" iconSrc="/imagenes/iconos/reloj.svg" />
+           <StatusCard title="EN PROGRESO" colorKey="orange" iconSrc="/imagenes/iconos/reloj.svg" />
+           <StatusCard title="PROGRAMADO" colorKey="blue" iconSrc="/imagenes/iconos/reloj.svg" />
+           <StatusCard title="COMPLETADO" colorKey="emerald" iconSrc="/imagenes/iconos/reloj.svg" />
         </div>
 
-        {/* FILA 3: ESTADO Y FECHA (NUEVO) */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Estado Inicial</label>
-            <select 
-              className="w-full p-2 border border-gray-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.estado}
-              onChange={(e) => setFormData({ ...formData, estado: e.target.value as OrdenEstado })}
-            >
-              <option value="pendiente">Pendiente</option>
-              <option value="en-proceso">En Proceso</option>
-              <option value="completada">Completada</option>
-            </select>
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 relative">
+          <h2 className="text-xl font-semibold mb-4">Ordenes de trabajo</h2>
+
+          {/*
+            Nota visual: las filas que siguen son ejemplos estáticos usados
+            para diseño y visualización. Cuando lleguen los datos reales
+            desde la BD, sustituir este bloque por un mapeo del array
+            devuelto por `getWorkOrders()`.
+          */}
+
+          <div className="absolute top-6 right-6">
+            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border">Ejemplo</span>
           </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Fecha Culminación</label>
-            <input 
-              type="date"
-              className="w-full p-1.5 border border-gray-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              value={formData.fechaCulminacion}
-              onChange={(e) => setFormData({ ...formData, fechaCulminacion: e.target.value })}
-            />
+
+          <div className="space-y-3">
+            <WorkOrderRow id="MNT-01" title="Servidor" type="Preventivo" date="12/05/2024" severity="ALTA" status="COMPLETADO" />
+            <WorkOrderRow id="MNT-02" title="Aire acondicionado" type="Correctivo" date="20/05/2024" severity="MEDIA" status="EN PROCESO" />
+            <WorkOrderRow id="MNT-03" title="Aire acondicionado" type="Preventivo" date="30/03/2024" severity="BAJA" status="PROGRAMADO" />
           </div>
         </div>
-
-        {/* FILA 4: PRIORIDAD Y TIPO */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Prioridad</label>
-            <select 
-              className="w-full p-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.prioridad}
-              onChange={(e) => setFormData({ ...formData, prioridad: e.target.value as Prioridad })}
-            >
-              <option value="baja">Baja</option>
-              <option value="media">Media</option>
-              <option value="alta">Alta</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1 text-center">Tipo</label>
-            <div className="flex border rounded-lg overflow-hidden">
-              <button 
-                type="button" 
-                onClick={() => setFormData({ ...formData, tipo: 'correctivo' })}
-                className={`flex-1 py-2 text-xs font-bold uppercase transition-colors ${
-                  formData.tipo === 'correctivo' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                }`}
-              >
-                Correctivo
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setFormData({ ...formData, tipo: 'preventivo' })}
-                className={`flex-1 py-2 text-xs font-bold uppercase transition-colors ${
-                  formData.tipo === 'preventivo' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                }`}
-              >
-                Preventivo
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-1 pt-2">
-          <label className="block text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1">
-           Notas Adicionales / Instrucciones
-          </label>
-          <textarea 
-            rows={3}
-            placeholder="Escriba aquí los detalles del reporte o instrucciones para el técnico..."
-            className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none placeholder:text-gray-300 transition-all"
-            
-          />
-        </div>
-
-        <div className="flex gap-3 mt-6">
-          <button 
-            type="button" 
-            onClick={() => setIsModalOpen(false)}
-            className="flex-1 py-2.5 border border-gray-200 rounded-lg font-bold text-gray-500 hover:bg-gray-50 transition-colors"
-          >
-            CANCELAR
-          </button>
-          <button 
-            type="submit"
-            className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md"
-          >
-            AGENDAR ORDEN
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-            )}
+      </div>
     </div>
   )
-
 }
 
-function StatCard({ icon, label, value, color }: { icon: any, label: string, value: string, color: string }) {
+function StatusCard({ title, count, colorKey, iconSrc }: { title: string; count?: number | null; colorKey: string; iconSrc?: string }) {
+  const map: Record<string, { bgHex: string; iconHex: string }> = {
+    // fondos más suaves / pastel para el círculo del icono
+    red: { bgHex: '#ecbdbd', iconHex: '#DC2626' },
+    orange: { bgHex: '#f5e2c9', iconHex: '#B45309' },
+    blue: { bgHex: '#cfe0f8', iconHex: '#1D4ED8' },
+    emerald: { bgHex: '#93e7b4', iconHex: '#059669' },
+  }
+  const cfg = map[colorKey] ?? map.blue
+
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-      <div className={`p-3 ${color} rounded-lg`}>{icon}</div>
-      <div>
-        <p className="text-sm text-gray-500">{label}</p>
-        <h3 className="text-2xl font-bold">{value}</h3>
+    <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm" style={{ backgroundColor: cfg.bgHex }}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill={cfg.iconHex} aria-hidden="true">
+            <path d="M12,24C5.383,24,0,18.617,0,12S5.383,0,12,0s12,5.383,12,12-5.383,12-12,12Zm0-22C6.486,2,2,6.486,2,12s4.486,10,10,10,10-4.486,10-10S17.514,2,12,2Zm2.5,14.33c.479-.276,.643-.888,.366-1.366l-1.866-3.232V6c0-.552-.447-1-1-1s-1,.448-1,1v6c0,.176,.046,.348,.134,.5l2,3.464c.186,.321,.521,.5,.867,.5,.17,0,.342-.043,.499-.134Z" />
+          </svg>
+        </div>
+        <div className="flex-1">
+          <div className="text-sm font-semibold uppercase">{title}</div>
+            {typeof count === "number" ? (
+              <div className="mt-2 text-base font-bold">{count}</div>
+            ) : (
+              <div className="mt-2 text-base font-bold text-gray-400">—</div>
+            )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function WorkOrderRow({ id, title, type, date, severity, status }: { id: string; title: string; type: string; date: string; severity: string; status: string }) {
+  const severityColor = severity === "ALTA" ? "bg-red-100 text-red-700" : severity === "MEDIA" ? "bg-orange-100 text-orange-700" : "bg-blue-100 text-blue-700"
+  const statusDot = status === "COMPLETADO" ? "bg-emerald-600" : status === "EN PROCESO" ? "bg-orange-500" : "bg-blue-500"
+  const typeBadgeClass = type.toLowerCase().includes("prevent") ? "bg-sky-600 text-white" : "bg-orange-500 text-white"
+
+  return (
+    <div className="w-full p-4 rounded-md bg-emerald-50 flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <div className="px-3 py-1 bg-white rounded-md text-sm font-medium border shadow-sm">{id}</div>
+        <div>
+          <div className="text-sm font-semibold">{title.toUpperCase()}</div>
+          <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
+            <span className={`inline-block px-2 py-1 rounded text-xs ${typeBadgeClass}`}>{type}</span>
+            <span className="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>{date}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-6">
+        <div className={`px-3 py-1 rounded-full text-xs font-medium ${severityColor}`}>{severity}</div>
+        <div className="flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${statusDot}`}></span>
+          <div className="text-sm text-gray-700 font-medium">{status}</div>
+        </div>
       </div>
     </div>
   )
