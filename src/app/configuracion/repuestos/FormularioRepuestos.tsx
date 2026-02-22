@@ -75,10 +75,10 @@ export const FormularioRepuestos = ({ isOpen, onClose }: Props) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex justify-end">
+        <div className="absolute inset-0 bg-transparent" onClick={onClose} />
       
-      <div className="relative w-full max-w-3xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full ml-[250px] bg-white shadow-2xl overflow-y-auto h-screen animate-in slide-in-from-right duration-300">
         <button onClick={onClose} className="absolute top-8 right-8 text-gray-400 hover:text-gray-600 transition-colors">
           <X size={24} />
         </button>
@@ -145,13 +145,13 @@ export const FormularioRepuestos = ({ isOpen, onClose }: Props) => {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 col-span-3">
               <label className="text-[11px] font-bold text-gray-400 uppercase ml-2 tracking-wider">Descripción Técnica</label>
               <textarea 
                 name="descripcion"
                 value={formData.descripcion}
-                placeholder="Rodamiento de Bolas de Alta Precisión - Serie 6200"
-                className="w-full p-6 border-2 border-gray-200 rounded-[24px] min-h-[120px] text-gray-600 text-sm outline-none bg-slate-50/30 focus:border-emerald-500/30 transition-colors"
+                placeholder="Describa las expecificaciones..."
+                className="w-full p-6 border-2 border-gray-100 rounded-[24px] min-h-[180px] text-gray-600 text-base outline-none bg-slate-50/30 focus:border-emerald-500/30 transition-colors"
                 onChange={handleChange}
               />
             </div>
