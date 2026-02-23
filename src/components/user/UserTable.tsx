@@ -23,8 +23,14 @@ export default function UserTable() {
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     // 4. FUNCIÓN: Eliminar usuario por ID
     const eliminarUsuario = (id: string) => {
-        const nuevosUsuarios = users.filter(user => user.id !== id);
-        setUsers(nuevosUsuarios);
+
+        const confirmation = window.confirm("⚠️ ALERTA: ¿Estás seguro de que deseas ELIMINAR a este usuario permanentemente? Esta acción no se puede deshacer.");
+
+        if (confirmation) {
+            const nuevosUsuarios = users.filter((user) => user.id !== id);
+            setUsers(nuevosUsuarios);
+        }
+
     };
 
     // 5. FUNCIÓN: Abrir modal para nuevo usuario (AGREGAR)
