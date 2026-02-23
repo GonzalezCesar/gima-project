@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, UserEstado, InternalLevel, Rol, Departamento } from '../../types/user';
+import {inspect} from "util";
+import colors = module
 
 interface UserModalProps {
     isOpen: boolean;
@@ -114,10 +116,10 @@ export default function UserModal({ isOpen, onClose, onSave, user }: UserModalPr
 };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-gray-100">
-                <div className="bg-gray-50 p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border-2 " style={{borderColor: "#0B2545"}}>
+                <div className=" p-6 border-b-2" style={{backgroundColor: "#0066FF", borderColor: "#0B2545"}}>
+                    <h2 className=" font-bold text-white gap-2 text-center" style={{fontSize: '30px'}}>
                         {user ? ' Editar Perfil' : ' Crear Nuevo Usuario'}
                     </h2>
                 </div>
@@ -128,19 +130,19 @@ export default function UserModal({ isOpen, onClose, onSave, user }: UserModalPr
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Nombre Completo</label>
-                                <input type="text" className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+                                <input type="text" className="font-medium w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none duration-300  hover:border-blue-400 hover:bg-white " value={nombre} onChange={(e) => setNombre(e.target.value)} required />
                             {errores.nombre && <p className="text-[10px] text-red-500 mt-1 font-bold">{errores.nombre}</p>}
                             </div>
                             
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Email Corporativo</label>
-                                <input type="email" className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                <input type="email" className="font-medium w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none duration-300  hover:border-blue-400 hover:bg-white " value={email} onChange={(e) => setEmail(e.target.value)} required />
                             {errores.email && <p className="text-[10px] text-red-500 mt-1 font-bold">{errores.email}</p>}
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Departamento</label>
-                                <select className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={departamento} onChange={(e) => setDepartamento(e.target.value as Departamento)}>
-                                    {LISTA_DEPARTAMENTOS.map(d => <option key={d} value={d}>{d}</option>)}
+                                <select className=" font-medium w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all appearance-none duration-300  hover:border-blue-400 hover:bg-white " value={departamento} onChange={(e) => setDepartamento(e.target.value as Departamento)}>
+                                    {LISTA_DEPARTAMENTOS.map(d => <option key={d} value={d}  className="font-medium">{d}</option>)}
                                 </select>
                             </div>
                             
@@ -150,22 +152,22 @@ export default function UserModal({ isOpen, onClose, onSave, user }: UserModalPr
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Cargo (Rol)</label>
-                                <select className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={rol} onChange={(e) => setRol(e.target.value as Rol)}>
-                                    {LISTA_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                                <select className="appearance-none font-medium w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300  hover:border-blue-400 hover:bg-white " value={rol} onChange={(e) => setRol(e.target.value as Rol)}>
+                                    {LISTA_ROLES.map(r => <option key={r} value={r} className="font-medium">{r}</option>)}
                                 </select>
                             </div>
                             
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Nivel Interno</label>
-                                <select className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={nivelInterno} onChange={(e) => setNivelInterno(e.target.value as InternalLevel)}>
-                                    {LISTA_NIVELES.map(n => <option key={n} value={n}>{n}</option>)}
+                                <select className="appearance-none font-medium w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300  hover:border-blue-400 hover:bg-white " value={nivelInterno} onChange={(e) => setNivelInterno(e.target.value as InternalLevel)}>
+                                    {LISTA_NIVELES.map(n => <option key={n} value={n} className="font-medium">{n}</option>)}
                                 </select>
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Estado</label>
-                                <select className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={estado} onChange={(e) => setEstado(e.target.value as UserEstado)}>
-                                    <option value="available"> Disponible</option>
-                                    <option value="unavailable"> No disponible</option>
+                                <select className="appearance-none font-medium w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300  hover:border-blue-400 hover:bg-white " value={estado} onChange={(e) => setEstado(e.target.value as UserEstado)}>
+                                    <option value="available" className="text-green-600 font-medium"> Disponible</option>
+                                    <option value="unavailable" className="text-red-600 font-medium"> No disponible</option>
                                 </select>
                             </div>
                         </div>
@@ -174,17 +176,17 @@ export default function UserModal({ isOpen, onClose, onSave, user }: UserModalPr
                     {/* Nivel de Seguridad con Estilo Diferente */}
                     <div className="mt-6 p-4 bg-blue-50 rounded-2xl border border-blue-100">
                         <label className="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">Seguridad y Permisos</label>
-                        <select className="w-full px-4 py-2 bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-700 transition-all" value={nivelSeguridad} onChange={(e) => setNivelSeguridad(e.target.value)}>
-                            <option value="Nivel 1">Nivel 1 (Básico)</option>
-                            <option value="Nivel 2">Nivel 2 (Intermedio)</option>
-                            <option value="Nivel 3">Nivel 3 (Avanzado)</option>
-                            <option value="Nivel 4">Nivel 4 (Administrador Total)</option>
+                        <select className="appearance-none w-full px-4 py-2 bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-700 transition-all duration-300  hover:border-blue-400 hover:bg-white" value={nivelSeguridad} onChange={(e) => setNivelSeguridad(e.target.value)}>
+                            <option value="Nivel 1" className="font-medium">Nivel 1 (Básico)</option>
+                            <option value="Nivel 2" className="font-medium">Nivel 2 (Intermedio)</option>
+                            <option value="Nivel 3" className="font-medium">Nivel 3 (Avanzado)</option>
+                            <option value="Nivel 4" className="font-medium">Nivel 4 (Administrador Total)</option>
                         </select>
                     </div>
 
                     <div className="mt-6">
                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Características / Notas</label>
-                        <textarea className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" rows={2} value={caracteristicas} onChange={(e) => setCaracteristicas(e.target.value)} />
+                        <textarea className="font-medium w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300  hover:border-blue-400 hover:bg-white" rows={2} value={caracteristicas} onChange={(e) => setCaracteristicas(e.target.value)} />
                     </div>
 
                     <div className="flex justify-end gap-3 mt-8">
