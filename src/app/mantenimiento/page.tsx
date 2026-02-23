@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { DashboardHeader } from "@/components/layout/DashboardHeader"
 import Link from "next/link"
-
+import FormNewOrden from '@/components/mantenimiento/FormNewOrden' // no borren este es el nuevo componente que cree para mostrar el formulario atte nicol
 /*
   Documentación extensa y guía de integración (DESARROLLADOR):
 
@@ -52,12 +52,20 @@ import Link from "next/link"
 export default function MantenimientoPage() {
   const [query, setQuery] = useState("")
 
+  const [isModalOpen, setIsModalOpen] = useState(false) //no borren este estado es para mostrar o no mostrar el formulario atte: nicol
+
   return (
     <div className="min-h-screen">
       <DashboardHeader subtitle="" />
 
       <div className="p-8 space-y-6">
         <div className="flex items-center justify-end">
+            <button  onClick={() => setIsModalOpen(true)} className="px-5 mr-4 py-3 bg-white text-gray-700 border border-gray-200 rounded-full text-base font-medium flex items-center gap-3 shadow-sm hover:bg-gray-50 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-blue-600" fill="currentColor">
+                <path d="M19,11h-6V5c0-.55-.45-1-1-1s-1,.45-1,1v6H5c-.55,0-1,.45-1,1s.45,1,1,1h6v6c0,.55,.45,1,1,1s1-.45,1-1v-6h6c.55,0,1-.45,1-1s-.45-1-1-1Z" />
+              </svg>
+              Nueva Orden
+            </button>{/* no borren este boton es para crear una nueva orden y abrir el formulario de nueva orden*/}
           <Link href="/mantenimiento/calendario">
             <button className="px-5 py-3 bg-blue-600 text-white rounded-full text-base flex items-center gap-3">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor" aria-hidden="true">
@@ -96,6 +104,23 @@ export default function MantenimientoPage() {
           </div>
         </div>
       </div>
+      {/*No borren aqui es donde se muestra el formulario de nueva orden*/}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl">
+            {/* Botón para cerrar el modal */}
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <FormNewOrden onClose={()=>{setIsModalOpen(false)}}/>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -127,6 +152,7 @@ function StatusCard({ title, count, colorKey, iconSrc }: { title: string; count?
             )}
         </div>
       </div>
+      
     </div>
   )
 }
