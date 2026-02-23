@@ -1,4 +1,4 @@
-export type UserEstado = 'available' | 'unavailable';
+export type UserEstado = 'available' | 'unavailable' | 'active' | 'inactive';
 
 //Nuevos campos Departamento , Rol , Nivel Interno, Permisos y caracteristicas 
 export type InternalLevel = 'Director ejecutivo' | 'Presidente' | 'Vicepresidente'| 'Líder de departamento'| 'Asistente'| 'Supervisor' | 'Operativos'| 'Administrador'| 'Tecnico'; 

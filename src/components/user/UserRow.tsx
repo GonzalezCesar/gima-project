@@ -79,10 +79,10 @@ export default function UserRow({ user, onEliminar, onEditar, onGestionarPermiso
                 <div className="flex justify-center items-center gap-2">
                     {/* Botones principales rápidos */}
                     <button onClick={() => onEditar(user)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full" title="Editar datos">
-                        ✏️
+                       Editar ️
                     </button>
                     <button onClick={() => {onEliminar(user.id);setMenuAbierto(false);}} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
-                        🗑️ 
+                        Borrar
                     </button>
                     {/* Botón de Tres Puntos */}
                     <div className="relative">
