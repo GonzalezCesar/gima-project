@@ -1,186 +1,492 @@
 "use client"
 
-import React, { useState } from "react"
-import { DashboardHeader } from "@/components/layout/DashboardHeader"
+import { useState } from "react"
 import Link from "next/link"
-import FormNewOrden from '@/components/mantenimiento/FormNewOrden' // no borren este es el nuevo componente que cree para mostrar el formulario atte nicol
-/*
-  Documentación extensa y guía de integración (DESARROLLADOR):
+import { Plus, Wrench, Clock, CheckCircle, X, Search, FileText, Download, CalendarDays } from "lucide-react"
+import { mockTecnicos, mockOrdenes } from "@/utils/mockMantenimiento"
+import { Orden as OrdenBase, OrdenEstado, TipoMantenimiento, Prioridad } from '@/types/mantenimiento'
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
-  Objetivo:
-  - Mantener la UI exactamente en el formato esperado por el diseño mientras
-    no haya una BD configurada. No mostrar "números ficticios" en las
-    métricas principales; en su lugar, mostrar un placeholder visual (—)
-    cuando no existan datos reales.
+// Interface extendida para campos personalizados
+interface Orden extends OrdenBase {
+  notas?: string;
+  tipo: TipoMantenimiento;
+}
 
-  Comportamiento actual implementado en este archivo:
-  - Los `StatusCard` ya no muestran valores numéricos ficticios. Si la
-    propiedad `count` no está presente o no es un número, se renderiza
-    un guion (`—`) gris como placeholder. Esto preserva el layout y el
-    peso visual del componente para cuando lleguen los datos reales.
-  - Las filas de "Ordenes de trabajo" se mantienen como ejemplos visibles
-    (tal como solicitaste) para referencia visual. Para dejar claro que
-    se trata de datos de ejemplo y evitar confusiones con datos reales,
-    la sección muestra una pequeña etiqueta `Ejemplo` en la esquina.
+export default function Mantenimiento() {
+  const [ordenes, setOrdenes] = useState<Orden[]>(mockOrdenes as Orden[]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  Cómo integrar datos reales cuando la BD/endpoint estén disponibles:
-  1) Implementar un servicio en `src/services/dataService.ts` que exponga
-     funciones como `getMaintenanceSummary()` y `getWorkOrders()`.
-  2) Reemplazar las llamadas locales (los ejemplos aquí) por fetching real
-     en un hook (por ejemplo `useEffect`) o, en el caso de Next.js App Router,
-     usar funciones `fetch` en un componente servidor y pasar los props al
-     cliente. Ejemplo de contrato esperado:
-     - getMaintenanceSummary() -> { pendiente: number, en_progreso: number, programado: number, completado: number }
-     - getWorkOrders() -> Array<{ id, title, type, date, severity, status }>
-  3) Mapear los valores recibidos a las props de `StatusCard` y `WorkOrderRow`.
-  4) Mantener el mismo formato: si un campo falta, el componente ya maneja
-     placeholders (p. ej. `—` para números y textos grises para campos vacíos).
+  // ESTADOS PARA EL MODAL DE VISTA PREVIA DEL INFORME
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [lastCreatedOrder, setLastCreatedOrder] = useState<Orden | null>(null);
+  const [lastBudgetData, setLastBudgetData] = useState({ costo: '150.00', presupuestoDisponible: '5000.00', presupuestoUsado: '0.00', horaSugerida: '08:00' });
 
-  Notas sobre UX y visualización temporal:
-  - Mientras no hay datos, mostramos el placeholder en las métricas y
-    mantenemos ejemplos en la lista de órdenes con la etiqueta `Ejemplo`.
-  - Cuando lleguen datos reales, simplemente actualizar la fuente de datos
-    (y pasar `count` como número) hará que los `StatusCard` muestren
-    automáticamente los números reales.
+  const [formData, setFormData] = useState({
+    activo: '',
+    tecnicoId: '',
+    prioridad: 'media' as Prioridad,
+    tipo: 'correctivo' as TipoMantenimiento,
+    fechaServicio: new Date().toISOString().split('T')[0],
+    horaSugerida: '08:00',
+    notas: '',
+    costo: '150.00',
+    presupuestoDisponible: '5000.00',
+    presupuestoUsado: '0.00',
+    estado: 'pendiente' as OrdenEstado
+  });
 
-  Seguridad / producción:
-  - No incluir credenciales en código. Usar variables de entorno y un
-    servicio/dependency injection para los detalles de BD.
-  - Añadir manejo de errores y estados de carga para mejorar la UX.
-*/
+  const totalPendientes = ordenes.filter(o => o.estado === 'pendiente').length;
+  const totalEnProceso = ordenes.filter(o => o.estado === 'en-proceso').length;
+  const totalCompletadas = ordenes.filter(o => o.estado === 'completada').length;
 
-export default function MantenimientoPage() {
-  const [query, setQuery] = useState("")
+  const ordenesFiltradas = ordenes.filter((orden) => {
+    const nombreTecnico = orden.tecnicoNombre.toLowerCase();
+    const busqueda = searchTerm.toLowerCase();
+    return nombreTecnico.includes(busqueda);
+  });
 
-  const [isModalOpen, setIsModalOpen] = useState(false) //no borren este estado es para mostrar o no mostrar el formulario atte: nicol
+  const generarInformeIndividual = (datos: Orden) => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.setTextColor(37, 99, 235);
+    doc.text("INFORME DE MANTENIMIENTO DETALLADO", 14, 20);
+
+    autoTable(doc, {
+      startY: 30,
+      body: [
+        ['Nombre del equipo:', datos.activo, 'Tipo de servicio:', datos.tipo?.toUpperCase() || 'N/A'],
+        ['Código de inventario:', datos.id, 'Prioridad:', datos.prioridad.toUpperCase()],
+      ],
+      theme: 'plain',
+      styles: { fontSize: 10, cellPadding: 2 },
+      columnStyles: { 0: { fontStyle: 'bold' }, 2: { fontStyle: 'bold' } }
+    });
+
+    doc.setFillColor(37, 99, 235);
+    doc.rect(14, 50, 182, 8, 'F');
+    doc.setTextColor(255);
+    doc.setFontSize(10);
+    doc.text("RESUMEN DE ACTIVIDADES REALIZADAS", 18, 55);
+
+    doc.setTextColor(0);
+    doc.rect(14, 58, 182, 30);
+    doc.setFontSize(9);
+    const textoActividad = datos.notas || "No se ingresaron notas adicionales.";
+    doc.text(textoActividad, 18, 65, { maxWidth: 170 });
+
+    autoTable(doc, {
+      startY: 95,
+      head: [['REGISTRO CRONOLÓGICO', 'RESUMEN ECONÓMICO']],
+      body: [
+        [`Apertura: ${datos.fecha} ${lastBudgetData.horaSugerida}`, `Presupuesto Disponible: $${lastBudgetData.presupuestoDisponible}`],
+        [`Estado: ${datos.estado.toUpperCase()}`, `Presupuesto Usado: $${lastBudgetData.presupuestoUsado}`],
+        [``, `Costo Estimado: $${lastBudgetData.costo}`],
+        [``, `Saldo Restante: $${(parseFloat(lastBudgetData.presupuestoDisponible) - parseFloat(lastBudgetData.presupuestoUsado) - parseFloat(lastBudgetData.costo)).toFixed(2)}`],
+        [``, `Moneda: USD`],
+      ],
+      headStyles: { fillColor: [37, 99, 235] },
+      theme: 'grid'
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY + 35;
+    doc.line(14, finalY, 80, finalY);
+    doc.text("CARLOS MANTILLA", 14, finalY + 5);
+    doc.text("Técnico Principal", 14, finalY + 10);
+
+    doc.line(120, finalY, 190, finalY);
+    doc.text("ROBERTO GOMEZ", 120, finalY + 5);
+    doc.text("Supervisor de Planta", 120, finalY + 10);
+
+    doc.save(`Informe_${datos.activo.replace(/\s+/g, '_')}.pdf`);
+  };
+
+  const exportarInformePDF = () => {
+    const doc = new jsPDF();
+    doc.text("INFORME GENERAL GIMA", 14, 22);
+    autoTable(doc, {
+      startY: 40,
+      head: [['ID', 'ACTIVO', 'TÉCNICO', 'PRIORIDAD', 'ESTADO']],
+      body: ordenesFiltradas.map(o => [o.id, o.activo, o.tecnicoNombre, o.prioridad, o.estado]),
+      headStyles: { fillColor: [37, 99, 235] }
+    });
+    doc.save("GIMA_Reporte_General.pdf");
+  };
+
+  const handleCrearOrden = (e: React.FormEvent) => {
+    e.preventDefault();
+    const tecnico = mockTecnicos.find(t => t.id === formData.tecnicoId);
+    
+    const nuevaOrden: Orden = {
+      id: `ORD-${Math.floor(Math.random() * 1000)}`,
+      activo: formData.activo,
+      tecnicoId: formData.tecnicoId,
+      tecnicoNombre: tecnico ? tecnico.name : 'Sin asignar',
+      prioridad: formData.prioridad,
+      estado: formData.estado,
+      tipo: formData.tipo,
+      fecha: formData.fechaServicio,
+      notas: formData.notas, 
+      fechaCulminacion: ''
+    };
+
+    setOrdenes([nuevaOrden, ...ordenes]);
+    setLastCreatedOrder(nuevaOrden);
+    setLastBudgetData({ costo: formData.costo, presupuestoDisponible: formData.presupuestoDisponible, presupuestoUsado: formData.presupuestoUsado, horaSugerida: formData.horaSugerida });
+    setIsModalOpen(false);
+    setIsSuccessModalOpen(true);
+
+    setFormData({ 
+      activo: '', tecnicoId: '', prioridad: 'media', tipo: 'correctivo', 
+      fechaServicio: new Date().toISOString().split('T')[0], horaSugerida: '08:00', 
+      notas: '', costo: '150.00', presupuestoDisponible: '5000.00', presupuestoUsado: '0.00', estado: 'pendiente' 
+    });
+  };
+
+  const tecnicos = mockTecnicos.filter(user => user.rol?.toLowerCase() === 'tecnico');
 
   return (
-    <div className="min-h-screen">
-      <DashboardHeader subtitle="" />
-
-      <div className="p-8 space-y-6">
-        <div className="flex items-center justify-end">
-            <button  onClick={() => setIsModalOpen(true)} className="px-5 mr-4 py-3 bg-white text-gray-700 border border-gray-200 rounded-full text-base font-medium flex items-center gap-3 shadow-sm hover:bg-gray-50 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-blue-600" fill="currentColor">
-                <path d="M19,11h-6V5c0-.55-.45-1-1-1s-1,.45-1,1v6H5c-.55,0-1,.45-1,1s.45,1,1,1h6v6c0,.55,.45,1,1,1s1-.45,1-1v-6h6c.55,0,1-.45,1-1s-.45-1-1-1Z" />
-              </svg>
-              Nueva Orden
-            </button>{/* no borren este boton es para crear una nueva orden y abrir el formulario de nueva orden*/}
-          <Link href="/mantenimiento/calendario">
-            <button className="px-5 py-3 bg-blue-600 text-white rounded-full text-base flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor" aria-hidden="true">
-                <path d="M19,2.02v-.52c0-.83-.67-1.5-1.5-1.5s-1.5,.67-1.5,1.5v.5H8v-.5c0-.83-.67-1.5-1.5-1.5s-1.5,.67-1.5,1.5v.52C2.2,2.28,0,4.64,0,7.5v11c0,3.03,2.47,5.5,5.5,5.5h13c3.03,0,5.5-2.47,5.5-5.5V7.5c0-2.86-2.2-5.22-5-5.48ZM10,14v-4h4v4h-4Zm4,3v4h-4v-4h4ZM3,10H7v4H3v-4Zm14,0h4v4h-4v-4ZM5.5,5h13c1.21,0,2.22,.86,2.45,2H3.05c.23-1.14,1.24-2,2.45-2Zm-2.5,13.5v-1.5H7v4h-1.5c-1.38,0-2.5-1.12-2.5-2.5Zm15.5,2.5h-1.5v-4h4v1.5c0,1.38-1.12,2.5-2.5,2.5Z" />
-              </svg>
-              Calendario
-            </button>
+    <div className="min-h-screen p-6 bg-gray-50/50 text-gray-800 font-sans">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Mantenimiento</h1>
+          <p className="text-sm text-gray-500">Panel de control de servicios</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Buscar técnico..." 
+              className="pl-10 pr-4 py-2 border rounded-full bg-white outline-none focus:ring-2 focus:ring-blue-500 transition-all w-64"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Link
+            href="/mantenimiento/calendario"
+            className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+          >
+            <CalendarDays size={18} /> Calendario
           </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-           <StatusCard title="PENDIENTE" colorKey="red" iconSrc="/imagenes/iconos/reloj.svg" />
-           <StatusCard title="EN PROGRESO" colorKey="orange" iconSrc="/imagenes/iconos/reloj.svg" />
-           <StatusCard title="PROGRAMADO" colorKey="blue" iconSrc="/imagenes/iconos/reloj.svg" />
-           <StatusCard title="COMPLETADO" colorKey="emerald" iconSrc="/imagenes/iconos/reloj.svg" />
-        </div>
-
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 relative">
-          <h2 className="text-xl font-semibold mb-4">Ordenes de trabajo</h2>
-
-          {/*
-            Nota visual: las filas que siguen son ejemplos estáticos usados
-            para diseño y visualización. Cuando lleguen los datos reales
-            desde la BD, sustituir este bloque por un mapeo del array
-            devuelto por `getWorkOrders()`.
-          */}
-
-          <div className="absolute top-6 right-6">
-            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border">Ejemplo</span>
-          </div>
-
-          <div className="space-y-3">
-            <WorkOrderRow id="MNT-01" title="Servidor" type="Preventivo" date="12/05/2024" severity="ALTA" status="COMPLETADO" />
-            <WorkOrderRow id="MNT-02" title="Aire acondicionado" type="Correctivo" date="20/05/2024" severity="MEDIA" status="EN PROCESO" />
-            <WorkOrderRow id="MNT-03" title="Aire acondicionado" type="Preventivo" date="30/03/2024" severity="BAJA" status="PROGRAMADO" />
-          </div>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+          >
+            <Plus size={18} /> Nueva Orden
+          </button>
         </div>
       </div>
-      {/*No borren aqui es donde se muestra el formulario de nueva orden*/}
+
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <StatCard icon={<Clock className="text-orange-600" />} label="Pendientes" value={totalPendientes.toString()} color="bg-orange-100" />
+        <StatCard icon={<Wrench className="text-blue-600" />} label="En Proceso" value={totalEnProceso.toString()} color="bg-blue-100" />
+        <StatCard icon={<CheckCircle className="text-green-600" />} label="Completadas" value={totalCompletadas.toString()} color="bg-green-100" />
+      </div>
+
+      {/* TABLE */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 text-gray-400 text-xs uppercase font-bold">
+            <tr>
+              <th className="p-4">ID</th>
+              <th className="p-4">Activo</th>
+              <th className="p-4">Técnico</th>
+              <th className="p-4">Prioridad</th>
+              <th className="p-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {ordenesFiltradas.map((orden) => (
+              <tr key={orden.id} className="hover:bg-gray-50">
+                <td className="p-4 text-xs font-mono">{orden.id}</td>
+                <td className="p-4 font-bold">{orden.activo}</td>
+                <td className="p-4">{orden.tecnicoNombre}</td>
+                <td className="p-4">
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                    orden.prioridad === 'alta' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    {orden.prioridad}
+                  </span>
+                </td>
+                <td className="p-4 text-right">
+                  <button onClick={() => setOrdenes(ordenes.filter(o => o.id !== orden.id))} className="text-red-400 font-bold text-sm hover:text-red-600">Eliminar</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* MODAL PRINCIPAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl">
-            {/* Botón para cerrar el modal */}
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <FormNewOrden onClose={()=>{setIsModalOpen(false)}}/>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden">
+            <div className="bg-white p-6 flex justify-between items-center border-b">
+              <div>
+                <h2 className="text-xl font-bold uppercase">Nueva Orden</h2>
+                <p className="text-[10px] text-gray-400">Agendar servicio en mantenimiento</p>
+              </div>
+              <X className="cursor-pointer text-gray-400 hover:text-red-500" onClick={() => setIsModalOpen(false)} />
+            </div>
+
+            <form onSubmit={handleCrearOrden} className="p-6 space-y-4 text-left">
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Información</label>
+                <select 
+                  className="w-full p-2.5 border rounded-lg bg-gray-50 text-sm outline-none mt-1"
+                  value={formData.activo}
+                  onChange={(e) => setFormData({...formData, activo: e.target.value})} required
+                >
+                  <option value="">Seleccionar Activo...</option>
+                  <option value="Servidor Central">Servidor Central</option>
+                  <option value="Compresor Industrial">Compresor Industrial</option>
+                  <option value="Sistema de Aire">Sistema de Aire</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Fecha</label>
+                  <input type="date" className="w-full p-2.5 border rounded-lg bg-gray-50 text-sm mt-1" value={formData.fechaServicio} onChange={(e) => setFormData({...formData, fechaServicio: e.target.value})} />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Hora</label>
+                  <input type="time" className="w-full p-2.5 border rounded-lg bg-gray-50 text-sm mt-1" value={formData.horaSugerida} onChange={(e) => setFormData({...formData, horaSugerida: e.target.value})} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Tipo</label>
+                  <div className="flex border rounded-lg overflow-hidden mt-1 h-10">
+                    <button type="button" onClick={() => setFormData({...formData, tipo: 'correctivo'})} className={`flex-1 text-[10px] font-bold uppercase ${formData.tipo === 'correctivo' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>Correctivo</button>
+                    <button type="button" onClick={() => setFormData({...formData, tipo: 'preventivo'})} className={`flex-1 text-[10px] font-bold uppercase ${formData.tipo === 'preventivo' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>Preventivo</button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Prioridad</label>
+                  <select className="w-full h-10 px-2 border rounded-lg bg-gray-50 text-sm mt-1" value={formData.prioridad} onChange={(e) => setFormData({...formData, prioridad: e.target.value as Prioridad})}>
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Técnico</label>
+                <select className="w-full p-2.5 border rounded-lg bg-gray-50 text-sm mt-1" value={formData.tecnicoId} onChange={(e) => setFormData({...formData, tecnicoId: e.target.value})} required>
+                  <option value="">Seleccionar Técnico...</option>
+                  {tecnicos.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Presupuesto</label>
+                <div className="grid grid-cols-3 gap-3 mt-1">
+                  <div>
+                    <label className="text-[9px] text-gray-400">Disponible ($)</label>
+                    <input type="number" step="0.01" min="0" className="w-full p-2.5 border rounded-lg bg-gray-50 text-sm" value={formData.presupuestoDisponible} onChange={(e) => setFormData({...formData, presupuestoDisponible: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-gray-400">Usado ($)</label>
+                    <input type="number" step="0.01" min="0" className="w-full p-2.5 border rounded-lg bg-gray-50 text-sm" value={formData.presupuestoUsado} onChange={(e) => setFormData({...formData, presupuestoUsado: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-gray-400">Costo estimado ($)</label>
+                    <input type="number" step="0.01" min="0" className="w-full p-2.5 border rounded-lg bg-gray-50 text-sm" value={formData.costo} onChange={(e) => setFormData({...formData, costo: e.target.value})} />
+                  </div>
+                </div>
+                {parseFloat(formData.presupuestoUsado) + parseFloat(formData.costo) > parseFloat(formData.presupuestoDisponible) && (
+                  <p className="text-[10px] text-red-500 mt-1 font-medium">⚠ El costo usado + estimado supera el presupuesto disponible</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Notas</label>
+                <textarea rows={3} className="w-full p-3 border rounded-lg bg-gray-50 text-sm resize-none mt-1" value={formData.notas} onChange={(e) => setFormData({...formData, notas: e.target.value})} />
+              </div>
+
+              <div className="flex gap-4 pt-4 border-t">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-lg font-bold uppercase text-xs">Cancelar</button>
+                <button type="submit" className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold uppercase text-xs">Agendar</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-    </div>
-  )
-}
 
-function StatusCard({ title, count, colorKey, iconSrc }: { title: string; count?: number | null; colorKey: string; iconSrc?: string }) {
-  const map: Record<string, { bgHex: string; iconHex: string }> = {
-    // fondos más suaves / pastel para el círculo del icono
-    red: { bgHex: '#ecbdbd', iconHex: '#DC2626' },
-    orange: { bgHex: '#f5e2c9', iconHex: '#B45309' },
-    blue: { bgHex: '#cfe0f8', iconHex: '#1D4ED8' },
-    emerald: { bgHex: '#93e7b4', iconHex: '#059669' },
-  }
-  const cfg = map[colorKey] ?? map.blue
+      {/* MODAL DE VISTA PREVIA DEL INFORME (ESTILO IMAGEN) */}
+      {isSuccessModalOpen && lastCreatedOrder && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg w-full max-w-4xl shadow-2xl my-8 animate-in fade-in zoom-in duration-300 overflow-hidden flex flex-col">
+            
+            {/* CABECERA AZUL DEL SISTEMA */}
+            <div className="bg-[#004a7c] p-4 flex justify-between items-center text-white">
+              <h2 className="text-sm font-bold uppercase tracking-wider">Informe de Mantenimiento</h2>
+              <button onClick={() => setIsSuccessModalOpen(false)} className="hover:bg-white/10 p-1 rounded transition-colors">
+                <X size={20} />
+              </button>
+            </div>
 
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-      <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm" style={{ backgroundColor: cfg.bgHex }}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill={cfg.iconHex} aria-hidden="true">
-            <path d="M12,24C5.383,24,0,18.617,0,12S5.383,0,12,0s12,5.383,12,12-5.383,12-12,12Zm0-22C6.486,2,2,6.486,2,12s4.486,10,10,10,10-4.486,10-10S17.514,2,12,2Zm2.5,14.33c.479-.276,.643-.888,.366-1.366l-1.866-3.232V6c0-.552-.447-1-1-1s-1,.448-1,1v6c0,.176,.046,.348,.134,.5l2,3.464c.186,.321,.521,.5,.867,.5,.17,0,.342-.043,.499-.134Z" />
-          </svg>
-        </div>
-        <div className="flex-1">
-          <div className="text-sm font-semibold uppercase">{title}</div>
-            {typeof count === "number" ? (
-              <div className="mt-2 text-base font-bold">{count}</div>
-            ) : (
-              <div className="mt-2 text-base font-bold text-gray-400">—</div>
-            )}
-        </div>
-      </div>
-      
-    </div>
-  )
-}
+            {/* CONTENIDO DEL INFORME (ESTILO HOJA PAPEL) */}
+            <div className="p-8 bg-gray-50 flex-1 overflow-y-auto">
+              <div className="bg-white mx-auto shadow-lg border border-gray-200 p-10 max-w-[850px] min-h-[1000px] relative">
+                
+                {/* Header del Documento */}
+                <div className="flex justify-between items-start mb-8 border-b pb-6">
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-800 uppercase tracking-tight">Informe de Mantenimiento</h1>
+                    <p className="text-xs text-gray-500 mt-1">Caton #: orden #: {lastCreatedOrder.id}</p>
+                  </div>
+                  <div className="w-16 h-16 bg-blue-900 flex items-center justify-center rounded">
+                    <span className="text-white font-black text-2xl">A</span>
+                  </div>
+                </div>
 
-function WorkOrderRow({ id, title, type, date, severity, status }: { id: string; title: string; type: string; date: string; severity: string; status: string }) {
-  const severityColor = severity === "ALTA" ? "bg-red-100 text-red-700" : severity === "MEDIA" ? "bg-orange-100 text-orange-700" : "bg-blue-100 text-blue-700"
-  const statusDot = status === "COMPLETADO" ? "bg-emerald-600" : status === "EN PROCESO" ? "bg-orange-500" : "bg-blue-500"
-  const typeBadgeClass = type.toLowerCase().includes("prevent") ? "bg-sky-600 text-white" : "bg-orange-500 text-white"
+                {/* Info Principal */}
+                <div className="grid grid-cols-2 gap-x-12 gap-y-6 mb-10 text-sm">
+                  <div className="flex justify-between border-b border-gray-100 pb-2">
+                    <span className="text-gray-500">Nombre del equipo:</span>
+                    <span className="font-bold text-gray-800">{lastCreatedOrder.activo.toUpperCase()}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-gray-100 pb-2">
+                    <span className="text-gray-500">Tipo de servicio:</span>
+                    <span className="font-bold text-gray-800">{lastCreatedOrder.tipo.toUpperCase()}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-gray-100 pb-2">
+                    <span className="text-gray-500">Código de inventario:</span>
+                    <span className="font-bold text-gray-800">85</span>
+                  </div>
+                  <div className="flex justify-between border-b border-gray-100 pb-2">
+                    <span className="text-gray-500">Referencias de falla:</span>
+                    <span className="font-bold text-gray-800">N/A</span>
+                  </div>
+                </div>
 
-  return (
-    <div className="w-full p-4 rounded-md bg-emerald-50 flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        <div className="px-3 py-1 bg-white rounded-md text-sm font-medium border shadow-sm">{id}</div>
-        <div>
-          <div className="text-sm font-semibold">{title.toUpperCase()}</div>
-          <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
-            <span className={`inline-block px-2 py-1 rounded text-xs ${typeBadgeClass}`}>{type}</span>
-            <span className="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>{date}</span>
+                {/* Sección Actividades */}
+                <div className="mb-8">
+                  <div className="bg-[#006699] text-white px-4 py-1.5 text-[11px] font-bold uppercase mb-2 tracking-wide">
+                    Resumen de actividades realizadas
+                  </div>
+                  <div className="border border-gray-200 p-5 rounded-sm min-h-[120px] text-gray-700 text-sm leading-relaxed">
+                    {lastCreatedOrder.notas || "Mantenimiento preventivo programado para asegurar el correcto funcionamiento del activo. Limpieza interna y revisión de componentes críticos."}
+                  </div>
+                </div>
+
+                {/* Secciones Inferiores */}
+                <div className="grid grid-cols-2 gap-8 mb-20">
+                  <div>
+                    <div className="bg-[#006699] text-white px-4 py-1.5 text-[11px] font-bold uppercase mb-2 tracking-wide">
+                      Registro Cronológico
+                    </div>
+                    <div className="border border-gray-200 p-4 text-sm space-y-3">
+                      <div className="flex justify-between text-gray-600">
+                        <span>APERTURA DE ORDEN:</span>
+                        <span className="font-bold text-gray-800">{lastCreatedOrder.fecha} 08:30</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span>CIERRE DE ORDEN:</span>
+                        <span className="font-bold text-gray-800">---</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="bg-[#006699] text-white px-4 py-1.5 text-[11px] font-bold uppercase mb-2 tracking-wide">
+                      Resumen Económico
+                    </div>
+                    <div className="border border-gray-200 p-4 text-sm space-y-3">
+                      <div className="flex justify-between text-gray-600">
+                        <span>Presupuesto Disponible:</span>
+                        <span className="font-bold text-gray-800">${lastBudgetData.presupuestoDisponible}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span>Presupuesto Usado:</span>
+                        <span className="font-bold text-gray-800">${lastBudgetData.presupuestoUsado}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600 items-baseline border-t border-gray-100 pt-2">
+                        <span>Costo Estimado intervención:</span>
+                        <span className="font-bold text-lg text-blue-900">${lastBudgetData.costo}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600 items-baseline border-t border-gray-100 pt-2">
+                        <span>Saldo Restante:</span>
+                        <span className={`font-bold text-lg ${(parseFloat(lastBudgetData.presupuestoDisponible) - parseFloat(lastBudgetData.presupuestoUsado) - parseFloat(lastBudgetData.costo)) < 0 ? 'text-red-600' : 'text-green-700'}`}>
+                          ${(parseFloat(lastBudgetData.presupuestoDisponible) - parseFloat(lastBudgetData.presupuestoUsado) - parseFloat(lastBudgetData.costo)).toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-gray-500 text-[10px]">
+                        <span>Moneda:</span>
+                        <span>USD</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Firmas */}
+                <div className="flex justify-around items-end pt-12">
+                  <div className="text-center w-48">
+                    <div className="border-t border-gray-400 pt-2 font-bold text-sm text-gray-800 uppercase">Carlos Mantilla</div>
+                    <div className="text-xs text-gray-500">Técnico Principal</div>
+                  </div>
+                  <div className="text-center w-48">
+                    <div className="border-t border-gray-400 pt-2 font-bold text-sm text-gray-800 uppercase">Roberto Gomez</div>
+                    <div className="text-xs text-gray-500">Supervisor de Planta</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* BOTONES DE ACCIÓN (ESTILO IMAGEN) */}
+            <div className="bg-white p-6 border-t flex justify-end gap-3 items-center">
+              <button 
+                onClick={() => setIsSuccessModalOpen(false)}
+                className="px-8 py-2.5 bg-white border border-gray-300 text-gray-600 rounded font-bold hover:bg-gray-50 transition-all uppercase text-xs"
+              >
+                Cerrar
+              </button>
+              
+              <button 
+                onClick={() => {
+                  generarInformeIndividual(lastCreatedOrder);
+                  setIsSuccessModalOpen(false);
+                }}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded font-bold flex items-center gap-3 hover:bg-blue-700 transition-all shadow-lg active:scale-95 text-xs uppercase"
+              >
+                <Download size={16} />
+                Descargar Informe
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="flex items-center gap-6">
-        <div className={`px-3 py-1 rounded-full text-xs font-medium ${severityColor}`}>{severity}</div>
-        <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${statusDot}`}></span>
-          <div className="text-sm text-gray-700 font-medium">{status}</div>
+      {/* FOOTER ACTION */}
+      <div className="mt-6 flex justify-between items-center bg-white p-6 rounded-xl border">
+        <div className="text-left">
+          <h4 className="font-bold text-sm uppercase">Responsable</h4>
+          <p className="text-blue-600 font-bold text-lg">CARLOS MANTILLA</p>
         </div>
+        <button onClick={exportarInformePDF} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold flex gap-2">
+          <FileText size={18} /> GENERAR INFORME GENERAL
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function StatCard({ icon, label, value, color }: { icon: any, label: string, value: string, color: string }) {
+  return (
+    <div className="bg-white p-4 rounded-xl shadow-sm border flex items-center gap-4 hover:shadow-md transition-shadow">
+      <div className={`p-3 ${color} rounded-lg`}>{icon}</div>
+      <div className="text-left">
+        <p className="text-sm text-gray-500">{label}</p>
+        <h3 className="text-2xl font-bold">{value}</h3>
       </div>
     </div>
   )
