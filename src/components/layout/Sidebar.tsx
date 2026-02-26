@@ -22,6 +22,11 @@ export function Sidebar() {
 
   // Definimos los items aquí para mantener el código limpio
   const menuItems = [
+    // {
+    //   // icon: Start,
+    //   label: "Home",
+    //   href: "/dashboard",
+    // },
     {
       icon: LayoutDashboard,
       label: "Dashboard",
@@ -71,13 +76,15 @@ export function Sidebar() {
           )}
         >
           {/* Usamos object-contain y fill para mejor adaptación */}
-          <Image
-            src="/logo-gima.png"
-            alt="GIMA Logo"
-            fill
-            className="object-contain object-left"
-            priority
-          />
+          <Link href="/" className="absolute inset-0">
+            <Image
+              src="/logo-gima.png"
+              alt="GIMA Logo"
+              fill
+              className="object-contain object-left"
+              priority
+            />
+          </Link>
         </div>
         
         <button
