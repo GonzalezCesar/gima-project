@@ -1,7 +1,6 @@
 "use client"
 
 import { DashboardHeader } from "@/components/layout/DashboardHeader"
-import { StatCard } from "@/components/dashboard/StatCard"
 import { ChartPlaceholder } from "@/components/ui/ChartPlaceholder"
 
 export default function DashboardPage() {
@@ -11,10 +10,8 @@ export default function DashboardPage() {
 
       <div className="p-8 space-y-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <StatCard title="Total activos" value="12345" trend={12} trendLabel="este mes" />
-          <StatCard title="En mantenimiento" value="8" />
-          <StatCard title="Presupuesto ejecutado" value="100$" highlighted={true} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
         </div>
 
         {/* Chart */}
