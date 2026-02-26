@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { FormularioRepuestos } from "./FormularioRepuestos";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
-import { Search, Bell, User, Plus, ChevronLeft, Pencil, Trash2 } from "lucide-react";
+import { Plus, ChevronLeft, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export default function RepuestosPage() {
@@ -20,28 +20,11 @@ export default function RepuestosPage() {
     // Contenedor principal
     <div className="min-h-screen bg-[#F8FAFC] p-8">
       <DashboardHeader />
-      <div className="max-w-6xl mx-auto">
-
-
-        {/* ================= HEADER SUPERIOR ================= */}
-        <header className="flex justify-between items-center mb-10">
-
-          {/* TÍTULOS */}
-          <div>
-            <h1 className="text-[28px] font-bold text-gima-navy font-microgramma uppercase leading-tight tracking-tight">
-              Configuración /
-            </h1>
-
-            <h2 className="text-[28px] font-bold text-gima-navy font-microgramma uppercase leading-tight tracking-tight">
-              Repuestos
-            </h2>
-          </div>
-
-        </header>
+      <div className="w-full mx-auto">
 
         {/* BOTÓN VOLVER */}
         <Link href="/configuracion" >
-          <button className="flex items-center gap-2 text-gray-500 mb-6 hover:text-[#0d2344] transition-colors">
+          <button className="flex items-center gap-2 text-gray-500 m-3 hover:text-[#0d2344] transition-colors">
             <div className="bg-white p-1 rounded-md shadow-sm"><ChevronLeft size={16} /></div>
             <span className="text-sm font-medium">Volver a configuración</span>
           </button>

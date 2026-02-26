@@ -100,6 +100,7 @@ export default function ConfiguracionPage() {
           title="Gestión de repuestos"
           desc="Materiales y herramientas"
           icon={<Wrench size={20} />}
+          href="/configuracion/repuestos"
         />
         <ConfigCard
           title="Gestión módulo IA"

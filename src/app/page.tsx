@@ -19,7 +19,7 @@ export default function Home() {
             </div>
     
             {/* Chart */}
-            <ChartPlaceholder title="Disponibilidad de activos" period="Últimos 6 meses" />
+            <ChartPlaceholder title="Proximos mantenimientos preventivos" period="Últimos 6 meses" />
           </div>
         </div>
   )

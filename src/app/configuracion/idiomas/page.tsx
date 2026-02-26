@@ -87,34 +87,14 @@ export default function IdiomasPage() {
 
       {/* Contenido principal */}
       <main className="flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300">
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full mx-auto">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-xl sm:text-2xl font-semibold text-gima-navy">Idioma y Región</h1>
               <p className="text-sm text-gima-navy/70 mt-1">Personaliza la experiencia local del sistema</p>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Buscar"
-                  className="pl-8 pr-3 py-2 text-sm text-gima-navy border border-gima-navy/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-gima-blue focus:border-gima-blue w-36 sm:w-48"
-                />
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2">
-                  <SVGIcon name="busqueda" className="w-4 h-4 text-gima-navy/50" />
-                </span>
-              </div>
               
-              <button className="p-2 text-gima-navy hover:text-gima-blue relative">
-                <SVGIcon name="notificacion-de-campana" className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-gima-blue rounded-full"></span>
-              </button>
-              
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-gima-navy/10 flex items-center justify-center">
-                  <SVGIcon name="circulo-de-usuario" className="w-5 h-5" />
-                </div>
-              </div>
             </div>
           </div>
 
