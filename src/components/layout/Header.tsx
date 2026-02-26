@@ -1,7 +1,7 @@
 "use client"; // Importante
 
 import { Search, Bell, CircleUser, Menu } from 'lucide-react';
-import { useSidebar } from './sidebarContext'; 
+import { useSidebar } from "@/components/ui/sidebarContext"; 
 
 export default function Header() {
   const { toggle } = useSidebar(); 
