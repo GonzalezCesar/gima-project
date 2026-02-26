@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { MainLayout } from "@/components/layout/MainLayout";
-// @ts-expect-error: allow side-effect CSS import without type declarations
 import "./globals.css";
 
 const microgramma = localFont({

@@ -3,7 +3,6 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { ChartPlaceholder } from "@/components/ui/ChartPlaceholder";
 
-
 export default function Home() {
   
   return (

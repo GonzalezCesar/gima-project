@@ -1,12 +1,12 @@
 "use client";
-import { createContext, useState, useMemo } from 'react';
+import { createContext, useState, useMemo, ReactNode } from 'react';
 
 export const sidebarContext = createContext({
     isSidebarOpen: false,
     toggleSidebar: () => {},
 });
 
-export default function SidebarProvider({ children }) {
+export default function SidebarProvider({ children }: { children: ReactNode }) {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
