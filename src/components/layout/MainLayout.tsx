@@ -1,24 +1,25 @@
 "use client";
-
-import { usePathname } from "next/navigation";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { SidebarProvider } from "@/components/ui/sidebarContext";
+import { useSidebar } from "@/hooks/use-sidebar";
+import { cn } from "@/lib/utils";
 import type React from "react";
+import { Sidebar } from "@/components/layout/Sidebar";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const showSidebar = !pathname.startsWith('/auth');
+    const { isSidebarOpen } = useSidebar();
 
-  return (
-    <SidebarProvider>
-      <div className="flex h-screen bg-gray-50 overflow-hidden">
-        {showSidebar && <Sidebar />}
-        <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
-          <main className="flex-1 overflow-y-auto p-6 md:p-8">
-            {children}
-          </main>
+    return (
+        <div className={cn(
+            "flex h-screen bg-gray-50 overflow-hidden transition-all duration-300",
+        )}>
+            <Sidebar />
+            <div className={cn(
+                "flex-1 flex flex-col h-full w-full overflow-hidden transition-all duration-300",
+                isSidebarOpen ? "md:ml-64" : "ml-0"
+            )}>
+                <main className="flex-1 overflow-y-auto p-6 md:p-8">
+                    {children}
+                </main>
+            </div>
         </div>
-      </div>
-    </SidebarProvider>
-  );
+    );
 }

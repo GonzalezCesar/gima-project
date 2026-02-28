@@ -1,7 +1,6 @@
 "use client"
 
 import { DashboardHeader } from "@/components/layout/DashboardHeader"
-import { StatCard } from "@/components/dashboard/StatCard"
 import { ChartPlaceholder } from "@/components/ui/ChartPlaceholder"
 import { UpcomingTasks } from "@/components/dashboard/UpcomingTasks";
 import { AssetStatus } from "@/components/dashboard/AssetStatus";

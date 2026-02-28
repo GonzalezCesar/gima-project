@@ -1,32 +1,29 @@
 "use client";
+import { createContext, useState, useMemo, ReactNode } from 'react';
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+export const sidebarContext = createContext({
+    isSidebarOpen: false,
+    toggleSidebar: () => {},
+});
 
-type SidebarContextType = {
-  isOpen: boolean;
-  toggle: () => void;
-  open: () => void;
-  close: () => void;
-};
+export default function SidebarProvider({ children }: { children: ReactNode }) {
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
+    const toggleSidebar = () => {
+        setSidebarOpen(!isSidebarOpen);
+    };
 
-export function SidebarProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+    const value = useMemo(
+        () => ({
+            isSidebarOpen,
+            toggleSidebar,
+        }),
+        [isSidebarOpen]
+    );
 
-  const toggle = () => setIsOpen((v) => !v);
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
-
-  return (
-    <SidebarContext.Provider value={{ isOpen, toggle, open, close }}>
-      {children}
-    </SidebarContext.Provider>
-  );
-}
-
-export function useSidebar() {
-  const ctx = useContext(SidebarContext);
-  if (!ctx) throw new Error("useSidebar debe usarse dentro de SidebarProvider");
-  return ctx;
+    return (
+        <sidebarContext.Provider value={value}>
+            {children}
+        </sidebarContext.Provider>
+    );
 }
