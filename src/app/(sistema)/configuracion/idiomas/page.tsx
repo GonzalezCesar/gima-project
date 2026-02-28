@@ -86,41 +86,19 @@ export default function IdiomasPage() {
 
 
       {/* Contenido principal */}
-      <main className="flex-1 p-4 transition-all duration-300 md:ml-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300">
+        <div className="w-full mx-auto">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-2xl font-semibold text-gima-navy">Idioma y Región</h1>
+              <h1 className="text-xl sm:text-2xl font-semibold text-gima-navy">Idioma y Región</h1>
               <p className="text-sm text-gima-navy/70 mt-1">Personaliza la experiencia local del sistema</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Buscar"
-                  className="pl-8 pr-3 py-2 text-sm text-gima-navy border border-gima-navy/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-gima-blue focus:border-gima-blue w-48"
-                />
-                <span className="absolute left-2.5 top-2.5">
-                  <SVGIcon name="busqueda" className="w-4 h-4 text-gima-navy/50" />
-                </span>
-              </div>
+            <div className="flex items-center space-x-2 sm:space-x-4">
               
-              {/* Icono de notificaciones */}
-              <button className="p-2 text-gima-navy hover:text-gima-blue relative">
-                <SVGIcon name="notificacion-de-campana" className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-gima-blue rounded-full"></span>
-              </button>
-              
-              {/* Avatar de usuario */}
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-gima-navy/10 flex items-center justify-center">
-                  <SVGIcon name="circulo-de-usuario" className="w-5 h-5" />
-                </div>
-              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gima-navy/10">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gima-navy/10">
             <div className="flex items-center mb-4">
               <span className="mr-2">
                 <SVGIcon name="globo" className="w-5 h-5" />
@@ -128,7 +106,7 @@ export default function IdiomasPage() {
               <span className="text-sm font-medium text-gima-navy">IDIOMA DEL SISTEMA</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
               {languages.map((lang) => (
                 <div
                   key={lang.id}
@@ -141,8 +119,8 @@ export default function IdiomasPage() {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-gima-navy">{lang.name}</p>
-                      <p className="text-sm text-gima-navy/70">{lang.nativeName}</p>
+                      <p className="font-medium text-gima-navy text-sm sm:text-base">{lang.name}</p>
+                      <p className="text-xs sm:text-sm text-gima-navy/70">{lang.nativeName}</p>
                       {lang.isDefault && (
                         <span className="text-xs text-gima-blue mt-1 inline-block">
                           Predeterminado
@@ -150,7 +128,7 @@ export default function IdiomasPage() {
                       )}
                     </div>
                     {selectedLanguage === lang.id && (
-                      <div className="w-5 h-5 rounded-full bg-gima-blue flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full bg-gima-blue flex items-center justify-center flex-shrink-0 ml-2">
                         <SVGIcon name="check" white={true} className="w-3 h-3" />
                       </div>
                     )}
@@ -159,7 +137,7 @@ export default function IdiomasPage() {
               ))}
             </div>
 
-            <div className="border-t border-gima-navy/20 pt-6">
+            <div className="border-t border-gima-navy/10 pt-6">
               <div className="flex items-center mb-4">
                 <span className="text-gima-blue mr-2">
                 <SVGIcon name="formato_regionales" className="w-5 h-5" />
@@ -218,7 +196,7 @@ export default function IdiomasPage() {
             <div className="mt-8 flex justify-end">
               <button
                 onClick={handleSave}
-                className="flex items-center bg-gima-blue hover:bg-gima-navy text-white px-6 py-2.5 text-sm font-medium rounded-lg transition-colors"
+                className="w-full sm:w-auto flex items-center justify-center bg-gima-blue hover:bg-gima-navy text-white px-6 py-2.5 text-sm font-medium rounded-lg transition-colors"
               >
                 <SVGIcon name="check" className="w-4 h-4 mr-2" />
                 Guardar cambios

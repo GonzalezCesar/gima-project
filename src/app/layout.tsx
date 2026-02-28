@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { MainLayout } from "@/components/layout/MainLayout";
-// @ts-expect-error: allow side-effect CSS import without type declarations
 import "./globals.css";
 
 const microgramma = localFont({
@@ -31,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${microgramma.variable} ${archivo.variable} antialiased bg-gima-light`}
       >
-        <MainLayout>{children}</MainLayout>
+        {children}
       </body>
     </html>
   );

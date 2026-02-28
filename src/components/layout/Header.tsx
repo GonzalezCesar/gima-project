@@ -1,17 +1,19 @@
 "use client"; // Importante
 
+import { useContext } from 'react';
 import { Search, Bell, CircleUser, Menu } from 'lucide-react';
-import { useSidebar } from './sidebarContext'; 
+import { sidebarContext } from '../ui/sidebarContext';
 
 export default function Header() {
-  const { toggle } = useSidebar(); 
+  
+  const { toggleSidebar } = useContext(sidebarContext); 
 
   return (
     <header className="h-20 bg-white/80 backdrop-blur-md flex items-center justify-between px-6 md:px-10 sticky top-0 z-40 border-b border-gray-100 transition-all">
       
       <div className="flex items-center gap-4">
         <button 
-          onClick={toggle}
+          onClick={toggleSidebar} 
           className="p-2 md:hidden hover:bg-gray-100 rounded-lg transition-colors text-primary"
         >
           <Menu size={24} />
