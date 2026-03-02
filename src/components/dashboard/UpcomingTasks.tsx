@@ -16,11 +16,6 @@ export function UpcomingTasks() {
             <p className="text-xs text-slate-500 font-medium">Programado: 12 may 2024</p>
             </div>
         </div>
-
-        {/* Boton de asignar */}
-        <button className="text-blue-600 font-bold text-sm hover:underline px-4">
-            Asignar
-        </button>
       </div>
     </div>
   );
