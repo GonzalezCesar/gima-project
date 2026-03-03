@@ -8,7 +8,7 @@ import { AssetStatus } from "@/components/dashboard/AssetStatus";
 export default function DashboardPage() {
   return (
     <div className="min-h-screen">
-      <DashboardHeader subtitle="Bienvenido al panel GIMA" showSearch = {false}/>
+      <DashboardHeader subtitle="Bienvenido al panel GIMA" showSearch = {false} />
 
       <div className="p-8 space-y-8">
         {/* Stats Grid */}
