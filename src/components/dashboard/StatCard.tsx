@@ -4,7 +4,9 @@ import { cn } from "@/lib/utils"
 
 interface StatCardProps {
   title: string
-  value: string | number
+  count?: number;
+  total?: number;
+  value?: string | number
   trend?: number
   trendLabel?: string
   icon?: ReactNode
@@ -12,7 +14,12 @@ interface StatCardProps {
   className?: string
 }
 
-export function StatCard({ title, value, trend, trendLabel, icon, highlighted = false, className }: StatCardProps) {
+export function StatCard({ title, count, total, value, trend, trendLabel, highlighted = false }: StatCardProps) {
+  
+  const displayValue = (count !== undefined && total !== undefined)
+    ? `${count}/${total}` 
+    : value;
+  
   return (
     <div
       className={cn(
@@ -23,7 +30,7 @@ export function StatCard({ title, value, trend, trendLabel, icon, highlighted = 
       )}
     >
       <p className={cn("text-sm font-medium mb-2", highlighted ? "text-blue-100" : "text-gray-600")}>{title}</p>
-      <h3 className="text-4xl font-bold mb-4">{value}</h3>
+      <h3 className="text-4xl font-bold mb-4">{displayValue}</h3>
       {trend !== undefined && (
         <div
           className={cn(
