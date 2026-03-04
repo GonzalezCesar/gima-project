@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useState, useMemo, ReactNode } from 'react';
+import { createContext, useState, useMemo, ReactNode, useCallback } from 'react';
 
 export const sidebarContext = createContext({
     isSidebarOpen: false,
@@ -9,16 +9,16 @@ export const sidebarContext = createContext({
 export default function SidebarProvider({ children }: { children: ReactNode }) {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!isSidebarOpen);
-    };
+    const toggleSidebar = useCallback(() => {
+        setSidebarOpen((prev) => !prev);
+    }, []);
 
     const value = useMemo(
         () => ({
             isSidebarOpen,
             toggleSidebar,
         }),
-        [isSidebarOpen]
+        [isSidebarOpen, toggleSidebar]
     );
 
     return (
