@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation"
 interface DashboardHeaderProps {
   title?: string
   subtitle?: string
+  showSearch?: boolean;
 }
 
-export function DashboardHeader({ title, subtitle = "Bienvenido al panel GIMA" }: DashboardHeaderProps) {
+export function DashboardHeader({ title, subtitle = "Bienvenido al panel GIMA" , showSearch = true }: DashboardHeaderProps) {
   const pathname = usePathname()
   const pathParts = pathname.split("/").filter((part) => part)
   const lastPart = pathParts.length > 0 ? pathParts[pathParts.length - 1] : "Dashboard"
@@ -25,14 +26,16 @@ export function DashboardHeader({ title, subtitle = "Bienvenido al panel GIMA" }
         {/* Header actions */}
         <div className="flex items-center gap-4">
           {/* Search */}
+          {showSearch && (
           <div className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar activo..."
-              className="pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+              className="pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-full text-sm focus:outline-none"
             />
           </div>
+        )}
 
           {/* Notifications */}
           <button className="relative p-2.5 text-gray-600 hover:bg-gray-100 rounded-full transition">
