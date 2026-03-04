@@ -4,7 +4,6 @@ import { DashboardHeader } from "@/components/layout/DashboardHeader"
 import { StatCard } from "@/components/dashboard/StatCard"
 import { UpcomingTasks } from "@/components/dashboard/UpcomingTasks";
 import { AssetStatus } from "@/components/dashboard/AssetStatus";
-import { StatCard } from "@/components/dashboard/StatCard";
 
 export default function DashboardPage() {
   return (
